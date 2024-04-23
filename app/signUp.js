@@ -1,4 +1,4 @@
-import { View, Image, Text, TextInput, TouchableOpacity, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Pressable, Alert } from 'react-native';
 import React, { useState, useRef } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -7,7 +7,7 @@ import CustomKeyboardView from '../components/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
 import Loading from '../components/Loading';
 import { useRouter } from 'expo-router';
-import AlertCustom from '../components/AlertCustom';
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 export default function SignUp() {
    const router = useRouter();
@@ -20,13 +20,27 @@ export default function SignUp() {
 
    const handleRegister = async () => {
       if (!emailRef.current || !passwordRef.current || !usernameRef.current || !profileRef.current) {
-         this.AlertPro.open()
+         Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Erro!',
+            textBody: "Preencha todos os campos!",
+            button: 'Ok',
+         });
          return;
       }
 
       setLoading(true);
-      const response = await register();
-      // setLoading(false);
+      response = await register(emailRef.current, usernameRef.current, passwordRef.current, profileRef.current);
+      setLoading(false);
+
+      if (response.error === true) {
+         Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Erro!',
+            textBody: response.message,
+            button: 'Ok',
+         });
+      }
    }
 
    return (
@@ -56,7 +70,7 @@ export default function SignUp() {
                   <View style={{ height: hp(7), backgroundColor: "#1e1e1e" }} className="flex-row gap-4 px-4 bg-neutral-100 items-center rounded--2xl">
                      <Feather name="image" size={hp(2.7)} color="gray" />
                      <TextInput
-                        onChangeText={value => emailRef.current = value}
+                        onChangeText={value => profileRef.current = value}
                         style={{ fontSize: hp(2) }}
                         className="flex-1 font-semibold text-neutral-300"
                         placeholder="Profile url"
@@ -113,7 +127,7 @@ export default function SignUp() {
                </View>
             </View>
          </View>
-         <AlertCustom title="Cadastro" message="Preencha todos os campos!" />
+         <AlertNotificationRoot />
       </CustomKeyboardView>
    );
 }

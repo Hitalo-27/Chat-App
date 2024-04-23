@@ -1,5 +1,5 @@
-import { View, Image, Text, TextInput, TouchableOpacity, Pressable, Alert } from 'react-native';
 import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { StatusBar } from 'expo-status-bar';
 import { FontAwesome6, Octicons } from '@expo/vector-icons';
@@ -7,7 +7,7 @@ import CustomKeyboardView from '../components/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
 import Loading from '../components/Loading';
 import { useRouter } from 'expo-router';
-import AlertCustom from '../components/AlertCustom';
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 export default function SignIn() {
     const router = useRouter();
@@ -17,14 +17,28 @@ export default function SignIn() {
     const { login } = useAuth();
 
     const handleLogin = async () => {
-        if(!emailRef.current || !passwordRef.current){
-            this.AlertPro.open()
+        if (!emailRef.current || !passwordRef.current) {
+            Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Erro!',
+                textBody: "Preencha todos os campos!",
+                button: 'Ok',
+            });
             return;
         }
 
         setLoading(true);
-        const response = await login();
+        const response = await login(emailRef.current, passwordRef.current);
         setLoading(false);
+
+        if (response.error === true) {
+            Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Erro!',
+                textBody: response.message,
+                button: 'Ok',
+            });
+        }
     }
 
     return (
@@ -34,7 +48,6 @@ export default function SignIn() {
                 <View className="items-center">
                     <FontAwesome6 name="user-lock" size={150} color="#4c1d95" />
                 </View>
-
 
                 <View className="gap-10">
                     <Text style={{ fontSize: hp(4), color: "#e3e3e3" }} className="font-bold tracking-wider text-center text-neutral-800">Bem vindo!</Text>
@@ -72,28 +85,24 @@ export default function SignIn() {
                                     <View className="flex-row justify-center">
                                         <Loading size={hp(6.5)} />
                                     </View>
-
                                 ) : (
                                     <TouchableOpacity onPress={handleLogin} style={{ height: hp(6.5) }} className="bg-purple-900 rounded-xl justify-center items-center">
-                                        <Text style={{ fontSize: hp(2.7) }} className="text-white font-bold tracking-wider text-center bg-primary-500 rounded--2xl py-2 px-4">
-                                            Login
-                                        </Text>
+                                        <Text style={{ fontSize: hp(2.7) }} className="text-white font-bold tracking-wider text-center bg-primary-500 rounded--2xl py-2 px-4">Login</Text>
                                     </TouchableOpacity>
                                 )
-
                             }
                         </View>
 
                         <View className="flex-row justify-center">
-                            <Text style={{fontSize: hp(1.8)}} className="font-semibold text-neutral-500">Não tem uma conta? </Text>
+                            <Text style={{ fontSize: hp(1.8) }} className="font-semibold text-neutral-500">Não tem uma conta? </Text>
                             <Pressable onPress={() => router.push('/signUp')}>
-                                <Text style={{fontSize: hp(1.8)}} className="font-bold text-violet-500">Cadastre-se</Text>
+                                <Text style={{ fontSize: hp(1.8) }} className="font-bold text-violet-500">Cadastre-se</Text>
                             </Pressable>
                         </View>
                     </View>
                 </View>
             </View>
-            <AlertCustom title="Login" message="Preencha todos os campos!" />
+            <AlertNotificationRoot />
         </CustomKeyboardView>
     );
 }
