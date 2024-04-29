@@ -1,10 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from 'axios';
 export const AuthContext = createContext();
+import JWT from 'expo-jwt';
+import { decodeToken } from "react-jwt";
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
+  const JWT_SECRET = "OpI3TaszkA8h6xJkNokRXHFpM7s5TdDzmGWg1YVJPz57lWWLvpmMhmsF9rmIm5U8PM8tr4Xk6E9Bm0ed8H592wJX9bqolPdiACni6sccm1f7o6ejyud8Xid0pGtLIF4Z13qsec7vtuK9zpmspCBMzPlk4nabJuwUfyPykZlSsFPdym5XE3KuxGR3KJW7PgKYFqewgzh7";
 
   useEffect(() => {
     if (user) {
@@ -17,7 +20,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'https://c288-2804-7f0-b902-fd18-d0bc-41a1-27e1-b8d.ngrok-free.app/user/login',
+        'https://c601-2804-7f0-b902-fd18-5896-d97b-244b-da3e.ngrok-free.app/user/login',
         {
           email: email,
           password: password,
@@ -28,7 +31,12 @@ export const AuthContextProvider = ({ children }) => {
           },
         }
       );
-      setUser(true);
+
+      const user = decodeToken(response.data.message.token);
+
+      // const myDecodedToken = JWT.decode(response.data.message.token, JWT_SECRET);
+
+      setUser(user);
       return response.data;
     } catch (error) {
       return error.response.data;
@@ -37,7 +45,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      setUser(false);
+      setUser(null);
     } catch (error) {
 
     }

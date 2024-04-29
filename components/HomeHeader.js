@@ -13,10 +13,11 @@ import { MenuItem } from "./CustomMenuItems";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { useAuth } from "../context/authContext";
 
+
 const ios = Platform.OS == 'ios';
 export default function HomeHeader() {
    const { top } = useSafeAreaInsets();
-   const { logout } = useAuth();
+   const { logout, user } = useAuth();
 
    const handleProfile = () => {
 
@@ -64,7 +65,7 @@ export default function HomeHeader() {
                   }}
                >
                   <MenuItem
-                     text="Perfil"
+                     text={user?.name || "Perfil"}
                      action={handleProfile}
                      value={null}
                      icon={<Feather name="user" size={hp(2.5)} color="#e3e3e3" />}
