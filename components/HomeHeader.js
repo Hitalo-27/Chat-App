@@ -12,15 +12,16 @@ import {
 import { MenuItem } from "./CustomMenuItems";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { useAuth } from "../context/authContext";
-
+import { useRouter } from "expo-router";
 
 const ios = Platform.OS == 'ios';
-export default function HomeHeader() {
+export default function HomeHeader({title}) {
    const { top } = useSafeAreaInsets();
    const { logout, user } = useAuth();
+   const router = useRouter();
 
    const handleProfile = () => {
-
+      router.push("profile");
    }
 
    const handleLogout = async () => {
@@ -30,7 +31,7 @@ export default function HomeHeader() {
    return (
       <View style={{ paddingTop: ios ? top : top + 10 }} className="flex-row justify-between px-5 bg-violet-900 pb-6 rounded-b-3xl shadow">
          <View>
-            <Text style={{ fontSize: hp(3) }} className="font-medium text-white">Conversas</Text>
+            <Text style={{ fontSize: hp(3) }} className="font-medium text-white">{title}</Text>
          </View>
 
          <View>

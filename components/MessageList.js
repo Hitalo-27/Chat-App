@@ -9,11 +9,13 @@ export default function MessageList({messages, currentUser}) {
       contentContainerStyle={{ paddingTop: 10 }}
     >
       {
-        messages.map((message, index) => {
-          return (
-            <MessageItem key={index} message={message} currentUser={currentUser} />
-          )
-        })
+        messages ? (
+          messages.map((message, index) => {
+            return (
+              <MessageItem key={index} message={message} currentUser={currentUser} />
+            )
+          })
+        ) : null
       }
     </ScrollView>
   );

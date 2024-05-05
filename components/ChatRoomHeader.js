@@ -5,7 +5,7 @@ import { Entypo, Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Stack } from 'expo-router';
 
-export default function ChatRoomHeader({router}) {
+export default function ChatRoomHeader({router, user}) {
   return (
     <Stack.Screen
       options={{
@@ -22,7 +22,7 @@ export default function ChatRoomHeader({router}) {
                 style={{ height: hp(4, 5), aspectRatio: 1, borderRadius: 100 }}
               />
               <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
-                Hitalo
+                {user?.name || 'Usuário'}
               </Text>
             </View>
           </View>

@@ -14,7 +14,13 @@ export default function _layout() {
             <Stack.Screen
                 name="home"
                 options={{
-                    header: () => <HomeHeader />,
+                    header: () => <HomeHeader title="Conversas" />,
+                }}
+            />
+            <Stack.Screen
+                name="contacts"
+                options={{
+                    header: () => <HomeHeader title="Contatos" />,
                 }}
             />
         </Stack>
