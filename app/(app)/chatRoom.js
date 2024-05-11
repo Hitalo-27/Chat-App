@@ -11,32 +11,12 @@ import { useAuth } from '../../context/authContext';
 
 export default function ChatRoom() {
   const router = useRouter();
-  const [messages, setMessages] = useState([]);
   const message = useRef("");
-  const { user } = useAuth();
+  const { user, getMessages, messages } = useAuth();
   const params = useLocalSearchParams();
 
-  const getMessages = async () => {
-    try {
-      const response = await axios.get(
-        `https://d941-2804-7f0-b902-fd18-cc65-a762-55ba-e71b.ngrok-free.app/chat/messages/${params.id}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer Authorization ${user.token}`
-          },
-        }
-      );
-
-      return response.data.message;
-    } catch (error) {
-      return [];
-    }
-  }
-
   const fetchMessages = async () => {
-    const messagesTeste = await getMessages();
-    setMessages(messagesTeste);
+    await getMessages(user, params.idConversation);
   }
 
   useEffect(() => {
@@ -46,20 +26,23 @@ export default function ChatRoom() {
   async function sendMessage() {
     if (message.current) {
       try {
+        const formData = new FormData();
+        formData.append('message', message.current);
+  
         const response = await axios.post(
-          `https://d941-2804-7f0-b902-fd18-cc65-a762-55ba-e71b.ngrok-free.app/chat/create/${user.id}`,
-          {
-            message: message.current
-          },
+          `https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/chat/create/${params.id}`,
+          formData,
           {
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'multipart/form-data',
               'Authorization': `Bearer Authorization ${user.token}`
             }
           }
         );
-        const messagesTeste = await getMessages();
-        setMessages(messagesTeste);
+  
+        await getMessages(user, params.idConversation);
+
+        message.current = "";
       } catch (error) {
         console.log(error);
       }

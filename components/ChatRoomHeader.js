@@ -18,7 +18,7 @@ export default function ChatRoomHeader({router, user}) {
             </TouchableOpacity>
             <View className="flex-row items-center gap-3">
               <Image
-                source="https://avatars.githubusercontent.com/u/56124084?v=4"
+                source={require('../assets/images/default.png')}
                 style={{ height: hp(4, 5), aspectRatio: 1, borderRadius: 100 }}
               />
               <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">

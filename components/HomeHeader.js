@@ -44,8 +44,8 @@ export default function HomeHeader({title}) {
                   }
                }}>
                   <Image
+                     source={require('../assets/images/default.png')}
                      style={{ height: hp(4.3), aspectRatio: 1, borderRadius: 100 }}
-                     source="https://avatars.githubusercontent.com/u/56124084?v=4"
                      placeholder={blurhash}
                      transition={500}
                   />

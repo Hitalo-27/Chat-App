@@ -23,7 +23,7 @@ export default function Contacts() {
    const getUsers = async () => {
       try {
          const response = await axios.get(
-            'https://d941-2804-7f0-b902-fd18-cc65-a762-55ba-e71b.ngrok-free.app/user/all',
+            'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/user/all',
             {
                headers: {
                   'Content-Type': 'application/json',

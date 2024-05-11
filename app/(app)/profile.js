@@ -9,7 +9,7 @@ import Loading from '../../components/Loading';
 export default function Profile() {
    const { user } = useAuth();
    const [name, setName] = useState(user.name);
-   const [email, setEmail] = useState(user.email);
+   const [email, setEmail] = useState(user.sub);
    const [password, setPassword] = useState('');
    const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ export default function Profile() {
          <View style={{ paddingTop: hp(7), paddingHorizontal: wp(5) }} className="flex-1 gap-12">
             <View className="items-center">
                <Image
-                  source={{ uri: 'https://img.freepik.com/fotos-gratis/respingo-colorido-abstrato-3d-background-generativo-ai-background_60438-2509.jpg' }}
+                  source={require('../../assets/images/default.png')}
                   style={{ height: hp(20), width: hp(20), borderRadius: 100, marginTop: hp(10) }}
                />
             </View>
@@ -48,8 +48,9 @@ export default function Profile() {
                      <TextInput
                         value={email}
                         onChangeText={setEmail}
+                        style={{ fontSize: hp(2) }}
                         className="flex-1 font-semibold text-neutral-300"
-                        placeholder="Email"
+                        placeholder="E-mail"
                         placeholderTextColor={'gray'}
                      />
                   </View>
@@ -58,8 +59,9 @@ export default function Profile() {
                      <TextInput
                         value={password}
                         onChangeText={setPassword}
+                        style={{ fontSize: hp(2) }}
                         className="flex-1 font-semibold text-neutral-300"
-                        placeholder="Senha"
+                        placeholder="Nova Senha"
                         secureTextEntry
                         placeholderTextColor={'gray'}
                      />

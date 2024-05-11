@@ -8,6 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
   const [conversationUser, setConversationUser] = useState([]);
+  const [messages, setMessages] = useState([]);
   const JWT_SECRET = "OpI3TaszkA8h6xJkNokRXHFpM7s5TdDzmGWg1YVJPz57lWWLvpmMhmsF9rmIm5U8PM8tr4Xk6E9Bm0ed8H592wJX9bqolPdiACni6sccm1f7o6ejyud8Xid0pGtLIF4Z13qsec7vtuK9zpmspCBMzPlk4nabJuwUfyPykZlSsFPdym5XE3KuxGR3KJW7PgKYFqewgzh7";
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'https://d941-2804-7f0-b902-fd18-cc65-a762-55ba-e71b.ngrok-free.app/user/login',
+        'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/user/login',
         {
           email: email,
           password: password,
@@ -60,7 +61,7 @@ export const AuthContextProvider = ({ children }) => {
   const register = async (email, name, password) => {
     try {
       const response = await axios.post(
-        'https://d941-2804-7f0-b902-fd18-cc65-a762-55ba-e71b.ngrok-free.app/user/create',
+        'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/user/create',
         {
           email: email,
           name: name,
@@ -88,7 +89,7 @@ export const AuthContextProvider = ({ children }) => {
   const conversation = async (user) => {
     try {
       const response = await axios.get(
-        'https://d941-2804-7f0-b902-fd18-cc65-a762-55ba-e71b.ngrok-free.app/chat/conversation/by-user',
+        'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/chat/conversation/by-user',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -103,8 +104,28 @@ export const AuthContextProvider = ({ children }) => {
     }
   }
 
+  const getMessages = async (user, idConversation) => {
+    try {
+      console.log(idConversation);
+      const response = await axios.get(
+        `https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/chat/messages/${idConversation}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer Authorization ${user.token}`
+          },
+        }
+      );
+
+      setMessages(response.data.message);
+      return response.data.message;
+    } catch (error) {
+      return [];
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, register, conversationUser}}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, register, conversationUser, getMessages, messages }}>
       {children}
     </AuthContext.Provider>
   );
