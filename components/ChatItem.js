@@ -27,7 +27,7 @@ export default function ChatItem({ item, router, noBorder }) {
       params: {
         id: id,
         name: name,
-        idConversation: item.conversationId
+        idConversation: item.conversationId ? item.conversationId : null
       }
     });
   }

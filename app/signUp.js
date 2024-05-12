@@ -14,12 +14,11 @@ export default function SignUp() {
    const emailRef = useRef("");
    const passwordRef = useRef("");
    const usernameRef = useRef("");
-   const profileRef = useRef("");
    const [loading, setLoading] = useState(false);
    const { register } = useAuth();
 
    const handleRegister = async () => {
-      if (!emailRef.current || !passwordRef.current || !usernameRef.current || !profileRef.current) {
+      if (!emailRef.current || !passwordRef.current || !usernameRef.current) {
          Dialog.show({
             type: ALERT_TYPE.DANGER,
             title: 'Erro!',
@@ -30,7 +29,7 @@ export default function SignUp() {
       }
 
       setLoading(true);
-      response = await register(emailRef.current, usernameRef.current, passwordRef.current, profileRef.current);
+      response = await register(emailRef.current, usernameRef.current, passwordRef.current);
       setLoading(false);
 
       if (response.error === true) {
@@ -64,16 +63,6 @@ export default function SignUp() {
                         style={{ fontSize: hp(2) }}
                         className="flex-1 font-semibold text-neutral-300"
                         placeholder="Username"
-                        placeholderTextColor={'gray'}
-                     />
-                  </View>
-                  <View style={{ height: hp(7), backgroundColor: "#1e1e1e" }} className="flex-row gap-4 px-4 bg-neutral-100 items-center rounded--2xl">
-                     <Feather name="image" size={hp(2.7)} color="gray" />
-                     <TextInput
-                        onChangeText={value => profileRef.current = value}
-                        style={{ fontSize: hp(2) }}
-                        className="flex-1 font-semibold text-neutral-300"
-                        placeholder="Profile url"
                         placeholderTextColor={'gray'}
                      />
                   </View>
@@ -121,7 +110,7 @@ export default function SignUp() {
                   <View className="flex-row justify-center">
                      <Text style={{ fontSize: hp(1.8) }} className="font-semibold text-neutral-500">Já tem uma conta? </Text>
                      <Pressable onPress={() => router.push('/signIn')}>
-                        <Text style={{ fontSize: hp(1.8) }} className="font-bold text-purple-500">Login</Text>
+                        <Text style={{ fontSize: hp(1.8) }} className="font-bold text-purple-600">Login</Text>
                      </Pressable>
                   </View>
                </View>

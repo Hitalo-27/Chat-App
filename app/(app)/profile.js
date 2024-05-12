@@ -8,17 +8,47 @@ import { FontAwesome6, Octicons, Feather } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import Loading from '../../components/Loading';
 import * as ImagePicker from 'expo-image-picker';
+import { decodeToken } from 'react-jwt';
+import axios from 'axios';
 
 export default function Profile() {
    const { user } = useAuth();
    const [image, setImage] = useState(null);
+   const [imageCompleted, setImageCompleted] = useState(null);
    const [name, setName] = useState(user.name);
-   const [email, setEmail] = useState(user.sub);
    const [password, setPassword] = useState('');
    const [loading, setLoading] = useState(false);
 
-   const handleUpdateUser = () => {
-      // Implementação da função para atualizar os dados do usuário
+   const handleUpdateUser = async () => {
+      try {
+         const formData = new FormData();
+         formData.append('name', name);
+         formData.append('password', password);
+         if (imageCompleted) {
+            console.log(imageCompleted);
+            formData.append('image', {
+               uri: imageCompleted.uri,
+               name: 'image.jpg', // Nome do arquivo deve ser fornecido, você pode ajustar conforme necessário
+               type: 'image/jpeg', // Tipo do arquivo, você pode ajustar conforme necessário
+            });
+         }
+   
+         const response = await axios.put(
+            `http://192.168.15.5:8080/user/update`,
+            formData,
+            {
+               headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'Authorization': `Bearer Authorization ${user.token}`
+               }
+            }
+         );
+   
+         console.log(response.data);
+   
+      } catch (error) {
+         console.log(error);
+      }
    };
 
    const pickImage = async () => {
@@ -31,6 +61,7 @@ export default function Profile() {
 
       if (!result.canceled) {
          setImage(result.assets[0].uri);
+         setImageCompleted(result.assets[0]);
       }
    };
 
@@ -78,17 +109,6 @@ export default function Profile() {
                         style={{ fontSize: hp(2) }}
                         className="flex-1 font-semibold text-neutral-300"
                         placeholder="Username"
-                        placeholderTextColor={'gray'}
-                     />
-                  </View>
-                  <View style={{ height: hp(7), backgroundColor: "#1e1e1e" }} className="flex-row gap-4 px-4 bg-neutral-100 items-center rounded--2xl">
-                     <Octicons name="mail" size={hp(2.7)} color="gray" />
-                     <TextInput
-                        value={email}
-                        onChangeText={setEmail}
-                        style={{ fontSize: hp(2) }}
-                        className="flex-1 font-semibold text-neutral-300"
-                        placeholder="E-mail"
                         placeholderTextColor={'gray'}
                      />
                   </View>

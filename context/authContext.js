@@ -106,6 +106,10 @@ export const AuthContextProvider = ({ children }) => {
 
   const getMessages = async (user, idConversation) => {
     try {
+      if (!idConversation) {
+        setMessages([]);
+        return [];
+      }
       const response = await axios.get(
         `http://192.168.15.5:8080/chat/messages/${idConversation}`,
         {

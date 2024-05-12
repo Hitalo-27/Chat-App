@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import ChatRoomHeader from '../../components/ChatRoomHeader';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import MessageList from '../../components/MessageList';
@@ -15,8 +15,8 @@ export default function ChatRoom() {
   const [message, setMessage] = useState('');
   const { user, getMessages, messages } = useAuth();
   const params = useLocalSearchParams();
-
-  const socket = io('http://192.168.15.5:3000'); // Conecte-se ao servidor
+  const socket = io('http://192.168.15.5:3000');
+  const scrollViewRef = useRef(null);
 
   useEffect(() => {
     // Desconecte o socket quando o componente for desmontado
@@ -31,7 +31,25 @@ export default function ChatRoom() {
 
   useEffect(() => {
     fetchMessages();
+  
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow', updateScrollView
+    );
+  
+    return () => {
+      keyboardDidShowListener.remove();
+    };
   }, []);
+
+  useEffect(() => {
+    updateScrollView();
+  }, [messages]);
+
+  const updateScrollView = () => {
+    setTimeout(() => {
+      scrollViewRef?.current?.scrollToEnd({ animated: true });
+    }, 50);
+  }
 
   async function sendMessage() {
     if (message) {
@@ -77,7 +95,7 @@ export default function ChatRoom() {
         <View className="h-3 border-b border-neutral-800" />
         <View className="flex-1 justify-between bg-neutral-100 overflow-visible" style={{ backgroundColor: "#121212" }}>
           <View className="flex-1">
-            <MessageList messages={messages} currentUser={{ userId: user.id }} />
+            <MessageList scrollViewRef={scrollViewRef} messages={messages} currentUser={{ userId: user.id }} />
           </View>
           <View style={{ marginBottom: hp(2.7) }} className="pt-2">
             <View style={{ backgroundColor: "#1e1e1e" }} className="flex-row mx-3 justify-between bg-white border p-2 border-neutral-600 rounded-full pl-5">
