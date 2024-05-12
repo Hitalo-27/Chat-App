@@ -23,7 +23,7 @@ export default function Home() {
    const getConvesations = async () => {
       try {
          const response = await axios.get(
-            'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/chat/conversation/by-user',
+            'http://192.168.15.5:8080/chat/conversation/by-user',
             {
                headers: {
                   'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/user/login',
+        'http://192.168.15.5:8080/user/login',
         {
           email: email,
           password: password,
@@ -61,7 +61,7 @@ export const AuthContextProvider = ({ children }) => {
   const register = async (email, name, password) => {
     try {
       const response = await axios.post(
-        'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/user/create',
+        'http://192.168.15.5:8080/user/create',
         {
           email: email,
           name: name,
@@ -89,7 +89,7 @@ export const AuthContextProvider = ({ children }) => {
   const conversation = async (user) => {
     try {
       const response = await axios.get(
-        'https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/chat/conversation/by-user',
+        'http://192.168.15.5:8080/chat/conversation/by-user',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -106,9 +106,8 @@ export const AuthContextProvider = ({ children }) => {
 
   const getMessages = async (user, idConversation) => {
     try {
-      console.log(idConversation);
       const response = await axios.get(
-        `https://109f-2804-7f0-b902-fd18-e017-b6d7-6d7e-d35a.ngrok-free.app/chat/messages/${idConversation}`,
+        `http://192.168.15.5:8080/chat/messages/${idConversation}`,
         {
           headers: {
             'Content-Type': 'application/json',
