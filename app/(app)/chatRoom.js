@@ -15,7 +15,7 @@ export default function ChatRoom() {
   const [message, setMessage] = useState('');
   const { user, getMessages, messages } = useAuth();
   const params = useLocalSearchParams();
-  const socket = io('http://192.168.15.5:3000');
+  const socket = io('http://192.168.15.8:3000');
   const scrollViewRef = useRef(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function ChatRoom() {
   }, []);
 
   const fetchMessages = async () => {
-    await getMessages(user, params.idConversation);
+    await getMessages(user, params);
   }
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function ChatRoom() {
         formData.append('message', message);
   
         const response = await axios.post(
-          `http://192.168.15.5:8080/chat/create/${params.id}`,
+          `http://192.168.15.8:8080/chat/create/${params.id}`,
           formData,
           {
             headers: {
@@ -74,7 +74,7 @@ export default function ChatRoom() {
         setMessage('');
 
         // Atualize a lista de mensagens
-        await getMessages(user, params.idConversation);
+        await getMessages(user, params);
       } catch (error) {
         console.log(error);
         // Trate os erros de forma apropriada, se necessário

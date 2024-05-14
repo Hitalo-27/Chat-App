@@ -5,7 +5,7 @@ import { Entypo, Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Stack } from 'expo-router';
 
-export default function ChatRoomHeader({router, user}) {
+export default function ChatRoomHeader({ router, user }) {
   return (
     <Stack.Screen
       options={{

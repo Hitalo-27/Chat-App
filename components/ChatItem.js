@@ -3,6 +3,7 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../context/authContext';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ChatItem({ item, router, noBorder }) {
   const { user } = useAuth();
@@ -27,7 +28,10 @@ export default function ChatItem({ item, router, noBorder }) {
       params: {
         id: id,
         name: name,
-        idConversation: item.conversationId ? item.conversationId : null
+        idConversation: item.conversationId ? item.conversationId : null,
+        idLastMessage: item.chatId,
+        visualizeLastMessage : item.visualize,
+        senderIdLastMessage: item.senderId,
       }
     });
   }
@@ -42,6 +46,11 @@ export default function ChatItem({ item, router, noBorder }) {
       <View className="flex-1 gap-1">
         <View className="flex-row justify-between">
           <Text style={{ fontSize: hp(1.8) }} className="font-semibold text-neutral-50">{name ? name : "Usuário"}</Text>
+          {!item.visualize && item.senderId !== user.id ? (
+            <View className="flex-row items-center">
+              <MaterialIcons name="notifications-on" size={24} color="#e3e3e3" />
+            </View>
+          ) : null}
         </View>
         <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email}</Text>
       </View>

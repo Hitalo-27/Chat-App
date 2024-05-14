@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from 'axios';
 export const AuthContext = createContext();
-import JWT from 'expo-jwt';
 import { decodeToken } from "react-jwt";
 
 export const AuthContextProvider = ({ children }) => {
@@ -22,7 +21,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.5:8080/user/login',
+        'http://192.168.15.8:8080/user/login',
         {
           email: email,
           password: password,
@@ -36,8 +35,6 @@ export const AuthContextProvider = ({ children }) => {
 
       const user = decodeToken(response.data.message.token);
 
-      // const myDecodedToken = JWT.decode(response.data.message.token, JWT_SECRET);
-
       user.token = response.data.message.token;
       setUser(user);
 
@@ -45,7 +42,8 @@ export const AuthContextProvider = ({ children }) => {
 
       return response.data;
     } catch (error) {
-      return error.response.data;
+      console.log(error);
+      return error;
     }
   }
 
@@ -61,7 +59,7 @@ export const AuthContextProvider = ({ children }) => {
   const register = async (email, name, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.5:8080/user/create',
+        'http://192.168.15.8:8080/user/create',
         {
           email: email,
           name: name,
@@ -89,7 +87,7 @@ export const AuthContextProvider = ({ children }) => {
   const conversation = async (user) => {
     try {
       const response = await axios.get(
-        'http://192.168.15.5:8080/chat/conversation/by-user',
+        'http://192.168.15.8:8080/chat/conversation/by-user',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -104,14 +102,29 @@ export const AuthContextProvider = ({ children }) => {
     }
   }
 
-  const getMessages = async (user, idConversation) => {
+  const getMessages = async (user, params) => {
     try {
-      if (!idConversation) {
+      if (!params.idConversation) {
         setMessages([]);
         return [];
       }
+
+      if(params.idLastMessage){
+        if(parseInt(params.senderIdLastMessage) !== parseInt(user.id)){
+          await axios.put(
+            `http://192.168.15.8:8080/chat/visualize/${params.idLastMessage}`,
+            null,
+            {
+              headers: {
+                'Authorization': `Bearer Authorization ${user.token}`
+              }
+            }
+          );
+        }
+      }
+      
       const response = await axios.get(
-        `http://192.168.15.5:8080/chat/messages/${idConversation}`,
+        `http://192.168.15.8:8080/chat/messages/${params.idConversation}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -121,8 +134,10 @@ export const AuthContextProvider = ({ children }) => {
       );
 
       setMessages(response.data.message);
+
       return response.data.message;
     } catch (error) {
+      console.log(error);
       return [];
     }
   }

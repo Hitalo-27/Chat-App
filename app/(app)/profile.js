@@ -4,8 +4,8 @@ import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../../context/authContext';
 import CustomKeyboardView from '../../components/CustomKeyboardView';
-import { FontAwesome6, Octicons, Feather } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
+import { Entypo, Ionicons, Octicons, Feather } from '@expo/vector-icons';
+import { Stack, useRouter } from 'expo-router';
 import Loading from '../../components/Loading';
 import * as ImagePicker from 'expo-image-picker';
 import { decodeToken } from 'react-jwt';
@@ -18,6 +18,7 @@ export default function Profile() {
    const [name, setName] = useState(user.name);
    const [password, setPassword] = useState('');
    const [loading, setLoading] = useState(false);
+   const router = useRouter();
 
    const handleUpdateUser = async () => {
       try {
@@ -32,9 +33,9 @@ export default function Profile() {
                type: 'image/jpeg', // Tipo do arquivo, você pode ajustar conforme necessário
             });
          }
-   
+
          const response = await axios.put(
-            `http://192.168.15.5:8080/user/update`,
+            `http://192.168.15.8:8080/user/update`,
             formData,
             {
                headers: {
@@ -43,9 +44,9 @@ export default function Profile() {
                }
             }
          );
-   
+
          console.log(response.data);
-   
+
       } catch (error) {
          console.log(error);
       }
@@ -70,19 +71,23 @@ export default function Profile() {
          <StatusBar style="dark" />
          <Stack.Screen
             options={{
-               title: 'Perfil',
+               title: '',
                headerShadowVisible: false,
-               headerLeft: () => (
-                  <TouchableOpacity onPress={() => router.back()}>
-                     <Feather name="chevron-left" size={24} color="white" />
-                  </TouchableOpacity>
-               ),
                headerStyle: {
                   backgroundColor: '#581c87',
-                  height: hp(10),
-                  elevation: 0,
                },
-               headerTintColor: '#fff',
+               headerLeft: () => (
+                  <View className="flex-row items-center gap-4">
+                     <TouchableOpacity onPress={() => router.back()}>
+                        <Entypo name="chevron-left" size={hp(4)} color="#e3e3e3" />
+                     </TouchableOpacity>
+                     <View className="flex-row items-center gap-3">
+                        <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
+                           Perfil
+                        </Text>
+                     </View>
+                  </View>
+               ),
             }}
          />
          <View style={{ paddingTop: hp(7), paddingHorizontal: wp(5) }} className="flex-1 gap-12">
