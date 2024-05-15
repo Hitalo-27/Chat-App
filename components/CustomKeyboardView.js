@@ -19,6 +19,7 @@ export default function CustomKeyboardView({ children, inChat }) {
         style={{ flex: 1 }}
         bounces={false}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
         {...scrollViewConfig}
       >
         {
