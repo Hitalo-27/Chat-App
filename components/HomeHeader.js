@@ -1,5 +1,5 @@
 import { Platform, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -19,6 +19,12 @@ export default function HomeHeader({title}) {
    const { top } = useSafeAreaInsets();
    const { logout, user } = useAuth();
    const router = useRouter();
+   const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/images/${user.imageName}`);
+   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+
+   const handleImageError = () => {
+      setImageUri(fallbackImageUri);
+   };
 
    const handleProfile = () => {
       router.push("profile");
@@ -44,10 +50,11 @@ export default function HomeHeader({title}) {
                   }
                }}>
                   <Image
-                     source={require('../assets/images/default.png')}
+                     source={{ uri: imageUri }}
                      style={{ height: hp(4.3), aspectRatio: 1, borderRadius: 100 }}
                      placeholder={blurhash}
                      transition={500}
+                     onError={handleImageError}
                   />
                </MenuTrigger>
                <MenuOptions

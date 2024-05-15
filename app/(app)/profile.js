@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StatusBar, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StatusBar } from 'react-native';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../../context/authContext';
@@ -8,11 +8,12 @@ import { Entypo, Ionicons, Octicons, Feather } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import Loading from '../../components/Loading';
 import * as ImagePicker from 'expo-image-picker';
-import { decodeToken } from 'react-jwt';
 import axios from 'axios';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { decodeToken } from "react-jwt";
 
 export default function Profile() {
-   const { user } = useAuth();
+   const { user, setUser } = useAuth();
    const [image, setImage] = useState(null);
    const [imageCompleted, setImageCompleted] = useState(null);
    const [name, setName] = useState(user.name);
@@ -20,18 +21,36 @@ export default function Profile() {
    const [loading, setLoading] = useState(false);
    const router = useRouter();
 
+   const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/images/${user.imageName}`);
+   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+
+   const handleImageError = () => {
+      setImageUri(fallbackImageUri);
+   };
+
    const handleUpdateUser = async () => {
       try {
          const formData = new FormData();
          formData.append('name', name);
          formData.append('password', password);
          if (imageCompleted) {
-            console.log(imageCompleted);
-            formData.append('image', {
-               uri: imageCompleted.uri,
-               name: 'image.jpg', // Nome do arquivo deve ser fornecido, você pode ajustar conforme necessário
-               type: 'image/jpeg', // Tipo do arquivo, você pode ajustar conforme necessário
-            });
+            uri = imageCompleted.uri;
+
+            // Comprimir a imagem antes de enviá-la
+            const compressedImage = await ImageManipulator.manipulateAsync(
+               uri,
+               [],
+               { compress: 0.7, format: 'jpeg' } // Comprimir a imagem com qualidade de 70%
+            );
+            uri = compressedImage.uri;
+
+            if (uri) {
+               formData.append('image', {
+                  uri: uri,
+                  name: 'image.jpg',
+                  type: 'image/jpeg',
+               });
+            }
          }
 
          const response = await axios.put(
@@ -45,8 +64,9 @@ export default function Profile() {
             }
          );
 
-         console.log(response.data);
-
+         const newUser = decodeToken(response.data.message);
+         newUser.token = response.data.message;
+         setUser(newUser);
       } catch (error) {
          console.log(error);
       }
@@ -66,6 +86,11 @@ export default function Profile() {
       }
    };
 
+   useEffect(() => {
+      setName(user.name);
+      setImageUri(`http://192.168.15.9:8080/images/${user.imageName}`);
+   }, [user]);
+   
    return (
       <CustomKeyboardView>
          <StatusBar style="dark" />
@@ -94,8 +119,9 @@ export default function Profile() {
             <View className="items-center">
                <TouchableOpacity onPress={pickImage}>
                   <Image
-                     source={image ? { uri: image } : require('../../assets/images/default.png')}
+                     source={image ? { uri: image } : { uri: imageUri }}
                      style={{ height: hp(20), width: hp(20), borderRadius: 100, marginTop: hp(10) }}
+                     onError={handleImageError}
                   />
                   <View style={{ position: 'absolute', bottom: 0, right: 0, padding: 10, borderRadius: 100 }} className="bg-purple-900">
                      <Feather name="camera" size={24} color="white" />
