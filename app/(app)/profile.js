@@ -11,6 +11,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { decodeToken } from "react-jwt";
+import { ALERT_TYPE, Dialog, AlertNotificationRoot } from 'react-native-alert-notification';
 
 export default function Profile() {
    const { user, setUser } = useAuth();
@@ -67,8 +68,26 @@ export default function Profile() {
          const newUser = decodeToken(response.data.message);
          newUser.token = response.data.message;
          setUser(newUser);
+
+         Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: 'Sucesso!',
+            textBody: "Dados atualizados com sucesso!",
+            button: 'Ok',
+         });
+         return;
+
       } catch (error) {
          console.log(error);
+
+         Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Erro!',
+            textBody: "Ocorreu um erro ao atualizar os dados!",
+            button: 'Ok',
+         });
+
+         return;
       }
    };
 
@@ -90,7 +109,7 @@ export default function Profile() {
       setName(user.name);
       setImageUri(`http://192.168.15.9:8080/${user.imageName}`);
    }, [user]);
-   
+
    return (
       <CustomKeyboardView>
          <StatusBar style="dark" />
@@ -177,6 +196,14 @@ export default function Profile() {
                </View>
             </View>
          </View>
+         <AlertNotificationRoot colors={[{
+            label: 'white',
+            card: '#121212',
+            overlay: 'white',
+            success: '#581c87',
+            danger: 'red',
+            warning: 'yellow',
+         }]} />
       </CustomKeyboardView>
    );
 }

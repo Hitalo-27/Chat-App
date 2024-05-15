@@ -47,7 +47,7 @@ export default function SignUp() {
          <StatusBar style="dark" />
          <View style={{ paddingTop: hp(7), paddingHorizontal: wp(5) }} className="flex-1 gap-12">
             <View className="items-center">
-               <FontAwesome6 name="user-lock" size={150} color="#4c1d95" />
+               <FontAwesome6 name="user-lock" size={150} color="#581c87" />
             </View>
 
 
@@ -116,7 +116,14 @@ export default function SignUp() {
                </View>
             </View>
          </View>
-         <AlertNotificationRoot />
+         <AlertNotificationRoot colors={[{
+            label: 'white',
+            card: '#121212',
+            overlay: 'white',
+            success: '#581c87',
+            danger: 'red',
+            warning: 'yellow',
+         }]} />
       </CustomKeyboardView>
    );
 }

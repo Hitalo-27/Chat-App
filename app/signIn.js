@@ -7,7 +7,7 @@ import CustomKeyboardView from '../components/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
 import Loading from '../components/Loading';
 import { useRouter } from 'expo-router';
-import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import { ALERT_TYPE, Dialog, AlertNotificationRoot } from 'react-native-alert-notification';
 
 export default function SignIn() {
     const router = useRouter();
@@ -46,7 +46,7 @@ export default function SignIn() {
             <StatusBar style="dark" />
             <View style={{ paddingTop: hp(8), paddingHorizontal: wp(5) }} className="flex-1 gap-12">
                 <View className="items-center">
-                    <FontAwesome6 name="user-lock" size={150} color="#4c1d95" />
+                    <FontAwesome6 name="user-lock" size={150} color="#581c87" />
                 </View>
 
                 <View className="gap-10">
@@ -102,7 +102,15 @@ export default function SignIn() {
                     </View>
                 </View>
             </View>
-            <AlertNotificationRoot />
+
+            <AlertNotificationRoot colors={[{
+                label: 'white',
+                card: '#121212',
+                overlay: 'white',
+                success: '#581c87',
+                danger: 'red',
+                warning: 'yellow',
+            }]} />
         </CustomKeyboardView>
     );
 }
