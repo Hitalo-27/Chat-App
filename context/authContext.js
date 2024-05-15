@@ -103,9 +103,19 @@ export const AuthContextProvider = ({ children }) => {
 
   const getMessages = async (user, params) => {
     try {
+      let response = [];
       if (!params.idConversation) {
-        setMessages([]);
-        return [];
+        response = await axios.get(
+          `http://192.168.15.9:8080/chat/messages/user/${params.id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer Authorization ${user.token}`
+            },
+          }
+        );
+
+        params.idConversation = response.data.message.conversationId;
       }
 
       if(params.idLastMessage){
@@ -122,7 +132,7 @@ export const AuthContextProvider = ({ children }) => {
         }
       }
       
-      const response = await axios.get(
+      response = await axios.get(
         `http://192.168.15.9:8080/chat/messages/${params.idConversation}`,
         {
           headers: {
@@ -136,7 +146,7 @@ export const AuthContextProvider = ({ children }) => {
 
       return response.data.message;
     } catch (error) {
-      console.log(error);
+      setMessages([]);
       return [];
     }
   }

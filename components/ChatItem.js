@@ -5,10 +5,10 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { useAuth } from '../context/authContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function ChatItem({ item, router, noBorder }) {
+export default function ChatItem({ item, router, noBorder, isConversation}) {
   const { user } = useAuth();
 
-  const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/images/${item ? item.recipientImageName : ''}`);
+  const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/${item ? item.recipientImageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
   const handleImageError = () => {
@@ -56,7 +56,7 @@ export default function ChatItem({ item, router, noBorder }) {
       <View className="flex-1 gap-1">
         <View className="flex-row justify-between">
           <Text style={{ fontSize: hp(1.8) }} className="font-semibold text-neutral-50">{name ? name : "Usuário"}</Text>
-          {!item.visualize && item.senderId !== user.id ? (
+          {isConversation && !item.visualize && item.senderId !== user.id ? (
             <View className="flex-row items-center">
               <MaterialIcons name="notifications-on" size={24} color="#e3e3e3" />
             </View>

@@ -18,6 +18,7 @@ export default function ChatList({ users, isConversation = true }) {
           router={router}
           item={item}
           index={index}
+          isConversation={isConversation}
         />}
       />
 
