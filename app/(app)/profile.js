@@ -21,7 +21,7 @@ export default function Profile() {
    const [loading, setLoading] = useState(false);
    const router = useRouter();
 
-   const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/images/${user.imageName}`);
+   const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/images/${user ? user.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
    const handleImageError = () => {

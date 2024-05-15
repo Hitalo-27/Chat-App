@@ -143,7 +143,7 @@ export default function ChatRoom() {
     <CustomKeyboardView inChat={true}>
       <View className="flex-1">
         <StatusBar style="dark" />
-        <ChatRoomHeader router={router} user={{ name: params.name }} />
+        <ChatRoomHeader router={router} user={{ name: params.name, imageName: params.imageName }} />
         <View className="h-3 border-b border-neutral-800" />
         <View className="flex-1 justify-between bg-neutral-100 overflow-visible" style={{ backgroundColor: "#121212" }}>
           <View className="flex-1">
