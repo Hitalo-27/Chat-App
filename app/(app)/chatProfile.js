@@ -3,11 +3,11 @@ import { View, Text, TextInput, TouchableOpacity, StatusBar, FlatList } from 're
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../../context/authContext';
-import CustomKeyboardView from '../../components/CustomKeyboardView';
-import { Entypo, Ionicons, Octicons, Feather } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import ChatItem from '../../components/ChatItem';
+import MembersList from '../../components/MembersList';
+import { AlertNotificationRoot } from 'react-native-alert-notification';
 
 export default function ChatProfile() {
    const params = useLocalSearchParams();
@@ -18,16 +18,6 @@ export default function ChatProfile() {
 
    const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${conversation ? conversation.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-
-   const [selectedUsers, setSelectedUsers] = useState([]);
-
-   const handleSelectUser = (user) => {
-      if (selectedUsers.includes(user)) {
-         setSelectedUsers(selectedUsers.filter(u => u !== user));
-      } else {
-         setSelectedUsers([...selectedUsers, user]);
-      }
-   };
 
    const handleImageError = () => {
       setImageUri(fallbackImageUri);
@@ -114,12 +104,7 @@ export default function ChatProfile() {
          <View className="gap-2">
             <View className="flex-row items-center justify-center gap-4">
                <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
-                  Membros
-               </Text>
-            </View>
-            <View className="flex-row items-center justify-center gap-4">
-               <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
-                  0
+                  Membros: {users.length}
                </Text>
             </View>
          </View>
@@ -130,19 +115,24 @@ export default function ChatProfile() {
                keyExtractor={item => Math.random()}
                showsVerticalScrollIndicator={true}
                renderItem={({ item, index }) =>
-                  <ChatItem
+                  <MembersList
                      noBorder={index + 1 == users.length}
                      router={router}
                      item={item}
                      index={index}
-                     onSelect={handleSelectUser}
-                     isSelected={selectedUsers.includes(item)}
-                     isGroup={true}
-                     isConversation={false}
+                     conversationId={conversation.idConversation}
                   />
                }
             />
          </View>
+         <AlertNotificationRoot colors={[{
+            label: 'white',
+            card: '#121212',
+            overlay: 'white',
+            success: '#581c87',
+            danger: 'red',
+            warning: 'yellow',
+         }]} />
       </View>
    );
 }
