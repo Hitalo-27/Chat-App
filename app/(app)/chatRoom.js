@@ -3,7 +3,7 @@ import { Keyboard, StatusBar, TextInput, TouchableOpacity, View } from 'react-na
 import ChatRoomHeader from '../../components/ChatRoomHeader';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import MessageList from '../../components/MessageList';
-import { Feather } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import CustomKeyboardView from '../../components/CustomKeyboardView';
 import axios from 'axios';
@@ -85,7 +85,7 @@ export default function ChatRoom() {
           );
           uri = compressedImage.uri;
         }
-  
+
         const formData = new FormData();
         formData.append('message', messageAtual);
         if (uri) {
@@ -95,7 +95,7 @@ export default function ChatRoom() {
             type: 'image/jpeg',
           });
         }
-  
+
         const response = await axios.post(
           `http://192.168.15.8:8080/chat/create/${params.id}`,
           formData,
@@ -106,10 +106,10 @@ export default function ChatRoom() {
             }
           }
         );
-  
+
         // Notifique o servidor sobre a nova mensagem enviada
         socket.emit('message', { message: messageAtual });
-  
+
         setMessageAtual('');
         setImage(null);
         setImageCompleted(null);
@@ -124,7 +124,7 @@ export default function ChatRoom() {
           createdAt: response.data.message.createdAt,
           senderId: response.data.message.senderId.id,
         }
-  
+
         // Atualize a lista de mensagens
         setMessages([...messages, novaMessage]);
       } catch (error) {
@@ -143,19 +143,22 @@ export default function ChatRoom() {
     <CustomKeyboardView inChat={true}>
       <View className="flex-1">
         <StatusBar style="dark" />
-        <ChatRoomHeader router={router} user={{ user:params }} />
+        <ChatRoomHeader router={router} user={{ user: params }} />
         <View className="h-3 border-b border-neutral-800" />
         <View className="flex-1 justify-between bg-neutral-100 overflow-visible" style={{ backgroundColor: "#121212" }}>
           <View className="flex-1">
             <MessageList scrollViewRef={scrollViewRef} messages={messages} currentUser={{ userId: user.id }} />
           </View>
           {image && (
-            <View className="flex-row items-center justify-cente p-2 mx-3">
+            <View className="flex-row items-center justify-cente p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
               <Image
                 source={{ uri: image }}
-                style={{ width: wp(30), height: hp(10) }}
+                style={{ width: '100%', height: '100%' }}
                 className="rounded-lg"
               />
+              <TouchableOpacity onPress={() => setImage(null)} className="absolute top-0 right-0 rounded-full">
+                <AntDesign name="closecircle" size={24} color="#581c87" />
+              </TouchableOpacity>
             </View>
           )}
           <View style={{ marginBottom: hp(2.7) }} className="pt-2">
