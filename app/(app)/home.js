@@ -23,7 +23,7 @@ export default function Home() {
    const getConvesations = async () => {
       try {
          const response = await axios.get(
-            'http://192.168.15.9:8080/chat/conversation/by-user',
+            'http://192.168.15.8:8080/chat/conversation/by-user',
             {
                headers: {
                   'Content-Type': 'application/json',

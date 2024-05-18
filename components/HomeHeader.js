@@ -19,7 +19,7 @@ export default function HomeHeader({title}) {
    const { top } = useSafeAreaInsets();
    const { logout, user } = useAuth();
    const router = useRouter();
-   const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/${user ? user.imageName : ''}`);
+   const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${user ? user.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
    const handleImageError = () => {
@@ -32,6 +32,10 @@ export default function HomeHeader({title}) {
 
    const handleLogout = async () => {
       const response = await logout();
+   }
+
+   const handleGroupCreation = () => {
+      router.push("addUsersGroup");
    }
 
    return (
@@ -77,6 +81,12 @@ export default function HomeHeader({title}) {
                      action={handleProfile}
                      value={null}
                      icon={<Feather name="user" size={hp(2.5)} color="#e3e3e3" />}
+                  />
+                  <MenuItem
+                     text="Criar Grupo"
+                     action={handleGroupCreation}
+                     value={null}
+                     icon={<AntDesign name="addusergroup" size={hp(2.5)} color="#e3e3e3" />}
                   />
                   <MenuItem
                      text="Sair"

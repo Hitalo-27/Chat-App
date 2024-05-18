@@ -5,10 +5,10 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { useAuth } from '../context/authContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function ChatItem({ item, router, noBorder, isConversation}) {
+export default function ChatItem({ item, router, noBorder, isConversation, isGroup, isSelected, onSelect}) {
   const { user } = useAuth();
 
-  const [imageUri, setImageUri] = useState(`http://192.168.15.9:8080/${item ? item.recipientImageName : ''}`);
+  const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${item ? item.recipientImageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
   const handleImageError = () => {
@@ -45,8 +45,12 @@ export default function ChatItem({ item, router, noBorder, isConversation}) {
     });
   }
 
+  const handleSelect = () => {
+    onSelect(item);
+  }
+
   return (
-    <TouchableOpacity onPress={openChatRoom} className={`flex-row justify-between mx-4 items-center gap-3 mb-4 pb-2 ${noBorder ? '' : 'border-b border-neutral-600'}`}>
+    <TouchableOpacity onPress={isGroup ? handleSelect : openChatRoom} className={`flex-row justify-between mx-4 items-center gap-3 mb-4 pb-2 ${noBorder ? '' : 'border-b border-neutral-600'} ${isSelected ? 'bg-purple-900 px-2 py-2 rounded-lg' : ''}`}>
       <Image
         source={{ uri: imageUri }}
         style={{ height: hp(6), width: hp(6), borderRadius: 100 }}
