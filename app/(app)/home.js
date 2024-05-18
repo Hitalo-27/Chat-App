@@ -1,15 +1,15 @@
 import { View, Text, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import ChatList from '../../components/ChatList';
-import Loading from '../../components/Loading';
 import axios from 'axios';
+import { useRouter } from "expo-router";
 import { useAuth } from '../../context/authContext';
 
 export default function Home() {
    const [conversation, setConversation] = useState([]);
    const { user, messages } = useAuth();
+   const router = useRouter();
 
    useEffect(() => {
       const fetchConversation = async () => {
@@ -18,11 +18,15 @@ export default function Home() {
       }
 
       fetchConversation();
+
+      if (!messages) {
+         router.replace("contacts");
+      }
    }, [messages]);
 
    const getConvesations = async () => {
       try {
-         const response = await axios.get(
+         const responseUsers = await axios.get(
             'http://192.168.15.8:8080/chat/conversation/by-user',
             {
                headers: {
@@ -32,7 +36,21 @@ export default function Home() {
             }
          );
 
-         return response.data.message;
+         const responseGroups = await axios.get(
+            'http://192.168.15.8:8080/group/conversation/by-user',
+            {
+               headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer Authorization ${user.token}`
+               },
+            }
+         );
+
+         const response = responseUsers.data.message.concat(responseGroups.data.message);
+
+         console.log(response);
+         setConversation(response);
+         return response;
       } catch (error) {
          console.log(error);
       }

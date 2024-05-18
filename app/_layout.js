@@ -6,17 +6,15 @@ import { AuthContextProvider, useAuth } from "../context/authContext";
 import { MenuProvider } from "react-native-popup-menu";
 
 const MainLayout = () => {
-  const {isAuthenticated, conversationUser} = useAuth();
+  const {isAuthenticated} = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     if(typeof isAuthenticated === "undefined") return;
     const inApp = segments[0] === "(app)";
-    if(isAuthenticated && !inApp && conversationUser.length > 0) {
+    if(isAuthenticated && !inApp) {
       router.replace("home");
-    } else if(isAuthenticated && !inApp) {
-      router.replace("contacts");
     } else {
       router.replace("signIn");
     }
