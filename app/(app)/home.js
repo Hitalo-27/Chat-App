@@ -48,7 +48,6 @@ export default function Home() {
 
          const response = responseUsers.data.message.concat(responseGroups.data.message);
 
-         console.log(response);
          setConversation(response);
          return response;
       } catch (error) {

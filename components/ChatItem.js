@@ -19,7 +19,7 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
   var name = item.name;
   var imageName = item.recipientImageName;
 
-  if (!id) {
+  if (!id && !name) {
     if (!user) return;
     if (user.id === item.senderId) {
       id = item.userIdByRecipientId;
@@ -31,6 +31,8 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
   }
 
   const openChatRoom = () => {
+
+    console.log(item);
     router.push({
       pathname: 'chatRoom',
       params: {

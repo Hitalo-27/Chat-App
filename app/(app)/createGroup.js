@@ -67,10 +67,6 @@ export default function CreateGroup() {
             }
          );
 
-         console.log(responseCreate.data);
-
-         console.log("-------------------------------------------------------------");
-
          await Promise.all(selectedUsers.map(async (selectedUser) => {
             const responseAddUser = await axios.post(
                `http://192.168.15.8:8080/group/add/${responseCreate.data.message.conversationId.id}`,
@@ -84,7 +80,6 @@ export default function CreateGroup() {
                   }
                }
             );
-            console.log(responseAddUser.data);
          }));
 
          Dialog.show({

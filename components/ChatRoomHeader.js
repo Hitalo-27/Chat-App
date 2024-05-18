@@ -6,6 +6,7 @@ import { Image } from 'expo-image';
 import { Stack } from 'expo-router';
 
 export default function ChatRoomHeader({ router, user }) {
+  user = user.user;
   const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${user ? user.imageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
@@ -23,7 +24,7 @@ export default function ChatRoomHeader({ router, user }) {
             <TouchableOpacity onPress={() => router.back()}>
               <Entypo name="chevron-left" size={hp(4)} color="#e3e3e3" />
             </TouchableOpacity>
-            <View className="flex-row items-center gap-3">
+            <TouchableOpacity className="flex-row items-center gap-3" onPress={() => router.push({pathname: 'chatProfile', params: { user: JSON.stringify(user) }})}>
               <Image
                 source={{ uri: imageUri }}
                 style={{ height: hp(4, 5), aspectRatio: 1, borderRadius: 100 }}
@@ -32,7 +33,7 @@ export default function ChatRoomHeader({ router, user }) {
               <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
                 {user?.name || 'Usuário'}
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         ),
         headerRight: () => (
