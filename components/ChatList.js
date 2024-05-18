@@ -5,11 +5,11 @@ import { useRouter } from 'expo-router';
 import ChatItem from './ChatItem';
 import { Entypo } from '@expo/vector-icons';
 import { ALERT_TYPE, Dialog, AlertNotificationRoot } from 'react-native-alert-notification';
+import { useAuth } from '../context/authContext';
 
 export default function ChatList({ users, isConversation = true, isGroup = false }) {
   const router = useRouter();
-
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const {selectedUsers, setSelectedUsers} = useAuth();
 
   const handleSelectUser = (user) => {
     if (selectedUsers.includes(user)) {

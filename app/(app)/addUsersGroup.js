@@ -10,7 +10,7 @@ import { Entypo } from '@expo/vector-icons';
 
 export default function AddUsersGroup() {
    const [users, setUsers] = useState([]);
-   const { user } = useAuth();
+   const { user, selectedUsers } = useAuth();
    const router = useRouter();
 
    useEffect(() => {
@@ -25,7 +25,7 @@ export default function AddUsersGroup() {
    const getUsers = async () => {
       try {
          const response = await axios.get(
-            'http://192.168.15.8:8080/user/all',
+            'http://192.168.178.66:8080/user/all',
             {
                headers: {
                   'Content-Type': 'application/json',
@@ -51,14 +51,19 @@ export default function AddUsersGroup() {
                   backgroundColor: '#581c87',
                },
                headerLeft: () => (
-                  <View className="flex-row items-center gap-4">
-                     <TouchableOpacity onPress={() => router.back()}>
-                        <Entypo name="chevron-left" size={hp(4)} color="#e3e3e3" />
-                     </TouchableOpacity>
-                     <View className="flex-row items-center gap-3">
-                        <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
-                           Criar grupo
-                        </Text>
+                  <View className="flex-row justify-between items-center w-full">
+                     <View className="flex-row items-center gap-4">
+                        <TouchableOpacity onPress={() => router.back()}>
+                           <Entypo name="chevron-left" size={hp(4)} color="#e3e3e3" />
+                        </TouchableOpacity>
+                        <View className="flex-row items-center gap-3">
+                           <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
+                              Criar grupo
+                           </Text>
+                        </View>
+                     </View>
+                     <View className="flex-row items-center" style={{ marginRight: wp(10) }}>
+                        <Text style={{ fontSize: hp(1.5) }} className="font-medium text-neutral-100">Selecionados: {selectedUsers.length}</Text>
                      </View>
                   </View>
                ),

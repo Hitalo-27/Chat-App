@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 export default function MessageItem({ message, currentUser, toggleFullScreen }) {
-  const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${message.imageName}`);
+  const [imageUri, setImageUri] = useState(`http://192.168.178.66:8080/${message.imageName}`);
   const fallbackImageUri = 'https://media.istockphoto.com/id/1396814518/vector/image-coming-soon-no-photo-no-thumbnail-image-available-vector-illustration.jpg?s=612x612&w=0&k=20&c=hnh2OZgQGhf0b46-J2z7aHbIWwq8HNlSDaNp2wn_iko=';
   
   const handleImageError = () => {

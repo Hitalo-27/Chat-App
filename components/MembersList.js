@@ -16,7 +16,7 @@ import axios from 'axios';
 export default function MembersList({ item, router, noBorder, conversationId }) {
   const { user } = useAuth();
 
-  const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${item ? item.userImageName : ''}`);
+  const [imageUri, setImageUri] = useState(`http://192.168.178.66:8080/${item ? item.userImageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
   const handleImageError = () => {
@@ -29,7 +29,7 @@ export default function MembersList({ item, router, noBorder, conversationId }) 
       console.log(conversationId);
 
       const response = await axios.delete(
-        `http://192.168.15.8:8080/group/${conversationId}/remove/${item.userId}`,
+        `http://192.168.178.66:8080/group/${conversationId}/remove/${item.userId}`,
         {
           headers: {
             'Authorization': `Bearer Authorization ${user.token}`

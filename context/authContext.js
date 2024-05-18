@@ -7,6 +7,7 @@ export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
   const [messages, setMessages] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const JWT_SECRET = "OpI3TaszkA8h6xJkNokRXHFpM7s5TdDzmGWg1YVJPz57lWWLvpmMhmsF9rmIm5U8PM8tr4Xk6E9Bm0ed8H592wJX9bqolPdiACni6sccm1f7o6ejyud8Xid0pGtLIF4Z13qsec7vtuK9zpmspCBMzPlk4nabJuwUfyPykZlSsFPdym5XE3KuxGR3KJW7PgKYFqewgzh7";
 
   useEffect(() => {
@@ -20,7 +21,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.8:8080/user/login',
+        'http://192.168.178.66:8080/user/login',
         {
           email: email,
           password: password,
@@ -54,7 +55,7 @@ export const AuthContextProvider = ({ children }) => {
   const register = async (email, name, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.8:8080/user/create',
+        'http://192.168.178.66:8080/user/create',
         {
           email: email,
           name: name,
@@ -82,7 +83,7 @@ export const AuthContextProvider = ({ children }) => {
       let response = [];
       if (!params.idConversation) {
         response = await axios.get(
-          `http://192.168.15.8:8080/chat/messages/user/${params.id}`,
+          `http://192.168.178.66:8080/chat/messages/user/${params.id}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ export const AuthContextProvider = ({ children }) => {
       if(params.idLastMessage){
         if(parseInt(params.senderIdLastMessage) !== parseInt(user.id)){
           await axios.put(
-            `http://192.168.15.8:8080/chat/visualize/${params.idLastMessage}`,
+            `http://192.168.178.66:8080/chat/visualize/${params.idLastMessage}`,
             null,
             {
               headers: {
@@ -109,7 +110,7 @@ export const AuthContextProvider = ({ children }) => {
       }
       
       response = await axios.get(
-        `http://192.168.15.8:8080/chat/messages/${params.idConversation}`,
+        `http://192.168.178.66:8080/chat/messages/${params.idConversation}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isAuthenticated, login, logout, register, getMessages, messages, setMessages }}>
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated, login, logout, register, getMessages, messages, setMessages, selectedUsers, setSelectedUsers }}>
       {children}
     </AuthContext.Provider>
   );
