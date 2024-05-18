@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Keyboard, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ChatRoomHeader from '../../components/ChatRoomHeader';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import MessageList from '../../components/MessageList';
@@ -12,6 +12,7 @@ import io from 'socket.io-client';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { Audio } from 'expo-av';
 
 export default function ChatRoom() {
   const router = useRouter();
@@ -22,6 +23,9 @@ export default function ChatRoom() {
   const params = useLocalSearchParams();
   const scrollViewRef = useRef(null);
   const socket = io('http://192.168.15.8:3000');
+  const [recording, setRecording] = useState();
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [audioUri, setAudioUri] = useState(null);
 
   useEffect(() => {
     // Desconecte o socket quando o componente for desmontado
@@ -139,6 +143,56 @@ export default function ChatRoom() {
     fetchMessages();
   });
 
+  async function startRecording() {
+    try {
+      if (permissionResponse.status !== 'granted') {
+        await requestPermission();
+      }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(recording);
+    } catch (err) {
+      console.error('Failed to start recording', err);
+    }
+  }
+
+  async function stopRecording() {
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+    await Audio.setAudioModeAsync(
+      {
+        allowsRecordingIOS: false,
+      }
+    );
+    const uri = recording.getURI();
+    setAudioUri(uri);
+  }
+
+  async function excluseRecording() {
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+    await Audio.setAudioModeAsync(
+      {
+        allowsRecordingIOS: false,
+      }
+    );
+
+    setAudioUri(null);
+  }
+
+  async function playSound() {
+    if (audioUri) {
+      const { sound } = await Audio.Sound.createAsync({ uri: audioUri });
+      await sound.playAsync();
+    } else {
+      console.log('Nenhum áudio gravado para reproduzir.');
+    }
+  }
+
   return (
     <CustomKeyboardView inChat={true}>
       <View className="flex-1">
@@ -161,6 +215,16 @@ export default function ChatRoom() {
               </TouchableOpacity>
             </View>
           )}
+
+          {
+            audioUri && (
+              <View className="flex-row items-center justify-cente p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
+                <TouchableOpacity onPress={playSound} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
+                  <Feather name="play" size={hp(2.7)} color="black" />
+                </TouchableOpacity>
+              </View>
+            )
+          }
           <View style={{ marginBottom: hp(2.7) }} className="pt-2">
             <View style={{ backgroundColor: "#1e1e1e" }} className="flex-row mx-3 justify-between bg-white border p-2 border-neutral-600 rounded-full pl-5">
               <TextInput
@@ -171,12 +235,28 @@ export default function ChatRoom() {
                 style={{ fontSize: hp(2), backgroundColor: "tranparent", color: "#e3e3e3" }}
                 className="flex-1 mr-2"
               />
-              <TouchableOpacity onPress={pickImage} className="p-2 mr-[4px] rounded-full">
-                <Feather name="camera" size={hp(2.7)} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={sendMessage} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
-                <Feather name="send" size={hp(2.7)} color="black" />
-              </TouchableOpacity>
+              {recording ? (
+                <TouchableOpacity onPress={excluseRecording} className="bg-neutral-100 p-2 mr-[4px] rounded-full">
+                  <AntDesign name="delete" size={hp(2.7)} color="red" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity onPress={pickImage} className="p-2 mr-[4px] rounded-full">
+                  <Feather name="camera" size={hp(2.7)} color="white" />
+                </TouchableOpacity>
+              )}
+              {messageAtual ? (
+                <TouchableOpacity onPress={sendMessage} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
+                  <Feather name="send" size={hp(2.7)} color="black" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity onPress={recording ? stopRecording : startRecording} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
+                  {recording ? (
+                    <Feather name="stop-circle" size={hp(2.7)} color="red" />
+                  ) : (
+                    <Feather name="mic" size={hp(2.7)} color="black" />
+                  )}
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
