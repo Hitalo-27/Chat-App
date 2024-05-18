@@ -8,7 +8,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 export default function ChatItem({ item, router, noBorder, isConversation, isGroup, isSelected, onSelect}) {
   const { user } = useAuth();
 
-  const [imageUri, setImageUri] = useState(`http://192.168.178.66:8080/${item ? item.recipientImageName : ''}`);
+  const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${item ? item.recipientImageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
   const handleImageError = () => {

@@ -16,7 +16,7 @@ export default function ChatProfile() {
    const router = useRouter();
    const { user } = useAuth();
 
-   const [imageUri, setImageUri] = useState(`http://192.168.178.66:8080/${conversation ? conversation.imageName : ''}`);
+   const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${conversation ? conversation.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
    const handleImageError = () => {
@@ -26,7 +26,7 @@ export default function ChatProfile() {
    const handleUsers = async () => {
       try {
          const response = await axios.get(
-            `http://192.168.178.66:8080/group/members/${conversation.idConversation}`,
+            `http://192.168.15.8:8080/group/members/${conversation.idConversation}`,
             {
                headers: {
                   'Authorization': `Bearer Authorization ${user.token}`

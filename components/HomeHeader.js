@@ -19,7 +19,7 @@ export default function HomeHeader({title}) {
    const { top } = useSafeAreaInsets();
    const { logout, user } = useAuth();
    const router = useRouter();
-   const [imageUri, setImageUri] = useState(`http://192.168.178.66:8080/${user ? user.imageName : ''}`);
+   const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${user ? user.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
    const handleImageError = () => {
