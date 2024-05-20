@@ -10,7 +10,7 @@ import { Entypo } from '@expo/vector-icons';
 
 export default function AddUsersGroup() {
    const [users, setUsers] = useState([]);
-   const { user, selectedUsers } = useAuth();
+   const { user, selectedUsers, setSelectedUsers } = useAuth();
    const router = useRouter();
 
    useEffect(() => {
@@ -20,12 +20,15 @@ export default function AddUsersGroup() {
       }
 
       fetchUsers();
+
+      setSelectedUsers([]);
+
    }, [])
 
    const getUsers = async () => {
       try {
          const response = await axios.get(
-            'http://192.168.15.8:8080/user/all',
+            'http://192.168.15.11:8080/user/all',
             {
                headers: {
                   'Content-Type': 'application/json',

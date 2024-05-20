@@ -21,7 +21,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.8:8080/user/login',
+        'http://192.168.15.11:8080/user/login',
         {
           email: email,
           password: password,
@@ -55,7 +55,7 @@ export const AuthContextProvider = ({ children }) => {
   const register = async (email, name, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.8:8080/user/create',
+        'http://192.168.15.11:8080/user/create',
         {
           email: email,
           name: name,
@@ -76,14 +76,14 @@ export const AuthContextProvider = ({ children }) => {
     } catch (error) {
       return error.response.data;
     }
-  }
+}
 
   const getMessages = async (user, params) => {
     try {
       let response = [];
       if (!params.idConversation) {
         response = await axios.get(
-          `http://192.168.15.8:8080/chat/messages/user/${params.id}`,
+          `http://192.168.15.11:8080/chat/messages/user/${params.id}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export const AuthContextProvider = ({ children }) => {
       if(params.idLastMessage){
         if(parseInt(params.senderIdLastMessage) !== parseInt(user.id)){
           await axios.put(
-            `http://192.168.15.8:8080/chat/visualize/${params.idLastMessage}`,
+            `http://192.168.15.11:8080/chat/visualize/${params.idLastMessage}`,
             null,
             {
               headers: {
@@ -110,7 +110,7 @@ export const AuthContextProvider = ({ children }) => {
       }
       
       response = await axios.get(
-        `http://192.168.15.8:8080/chat/messages/${params.idConversation}`,
+        `http://192.168.15.11:8080/chat/messages/${params.idConversation}`,
         {
           headers: {
             'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ export default function Contacts() {
    const getUsers = async () => {
       try {
          const response = await axios.get(
-            'http://192.168.15.8:8080/user/all',
+            'http://192.168.15.11:8080/user/all',
             {
                headers: {
                   'Content-Type': 'application/json',

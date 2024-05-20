@@ -22,7 +22,7 @@ export default function ChatRoom() {
   const { user, getMessages, messages, setMessages } = useAuth();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef(null);
-  const socket = io('http://192.168.15.8:3000');
+  const socket = io('http://192.168.15.11:3000');
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [audioUri, setAudioUri] = useState(null);
@@ -101,7 +101,7 @@ export default function ChatRoom() {
         }
 
         const response = await axios.post(
-          `http://192.168.15.8:8080/chat/create/${params.id}`,
+          `http://192.168.15.11:8080/chat/create/${params.id}`,
           formData,
           {
             headers: {

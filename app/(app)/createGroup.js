@@ -22,7 +22,7 @@ export default function CreateGroup() {
    const router = useRouter();
    const params = useLocalSearchParams();
 
-   const [imageUri, setImageUri] = useState(`http://192.168.15.8:8080/${user ? user.imageName : ''}`);
+   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${user ? user.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
    const handleImageError = () => {
@@ -57,7 +57,7 @@ export default function CreateGroup() {
          }
 
          const responseCreate = await axios.post(
-            `http://192.168.15.8:8080/group/create`,
+            `http://192.168.15.11:8080/group/create`,
             formData,
             {
                headers: {
@@ -69,7 +69,7 @@ export default function CreateGroup() {
 
          await Promise.all(selectedUsers.map(async (selectedUser) => {
             const responseAddUser = await axios.post(
-               `http://192.168.15.8:8080/group/add/${responseCreate.data.message.conversationId.id}`,
+               `http://192.168.15.11:8080/group/add/${responseCreate.data.message.conversationId.id}`,
                {
                   userId: selectedUser.id,
                },
