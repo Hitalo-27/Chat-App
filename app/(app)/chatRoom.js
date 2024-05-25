@@ -17,13 +17,13 @@ import * as FileSystem from 'expo-file-system';
 
 export default function ChatRoom() {
   const router = useRouter();
-  const [image, setImage] = useState(null);
-  const [imageCompleted, setImageCompleted] = useState(null);
+  const [media, setMedia] = useState(null);
+  const [mediaCompleted, setMediaCompleted] = useState(null);
   const [messageAtual, setMessageAtual] = useState('');
   const { user, getMessages, messages, setMessages } = useAuth();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef(null);
-  const socket = io('http://192.168.15.11:3000');
+  const socket = io('https://server-chat-app-nfhd.onrender.com');
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
@@ -60,7 +60,7 @@ export default function ChatRoom() {
     }, 10);
   }
 
-  const pickImage = async () => {
+  const pickMedia = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -69,25 +69,32 @@ export default function ChatRoom() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setImageCompleted(result.assets[0]);
+      setMedia(result.assets[0].uri);
+      setMediaCompleted(result.assets[0]);
     }
   };
 
   async function sendMessage(audioTeste = null) {
-    if (messageAtual || imageCompleted || audioTeste) {
+    if (messageAtual || mediaCompleted || audioTeste) {
       try {
         let uri = null;
-        if (imageCompleted) {
-          uri = imageCompleted.uri;
+        let type = null;
+        let name = null;
 
-          // Comprimir a imagem antes de enviá-la
-          const compressedImage = await ImageManipulator.manipulateAsync(
-            uri,
-            [],
-            { compress: 0.7, format: 'jpeg' } // Comprimir a imagem com qualidade de 70%
-          );
-          uri = compressedImage.uri;
+        if (mediaCompleted) {
+          uri = mediaCompleted.uri;
+          type = mediaCompleted.type === 'video' ? 'video/mp4' : 'image/jpeg';
+          name = mediaCompleted.type === 'video' ? 'video.mp4' : 'image.jpg';
+
+          if (mediaCompleted.type === 'image') {
+            // Comprimir a imagem antes de enviá-la
+            const compressedImage = await ImageManipulator.manipulateAsync(
+              uri,
+              [],
+              { compress: 0.7, format: 'jpeg' } // Comprimir a imagem com qualidade de 70%
+            );
+            uri = compressedImage.uri;
+          }
         }
 
         const formData = new FormData();
@@ -95,8 +102,8 @@ export default function ChatRoom() {
         if (uri) {
           formData.append('file', {
             uri: uri,
-            name: 'image.jpg',
-            type: 'image/jpeg',
+            name: name,
+            type: type,
           });
         } else if (audioTeste) {
           formData.append('file', {
@@ -121,8 +128,8 @@ export default function ChatRoom() {
         socket.emit('message', { message: messageAtual });
 
         setMessageAtual('');
-        setImage(null);
-        setImageCompleted(null);
+        setMedia(null);
+        setMediaCompleted(null);
 
         let novaMessage = {
           message: response.data.message.message,
@@ -196,7 +203,11 @@ export default function ChatRoom() {
         allowsRecordingIOS: false,
       }
     );
+  }
 
+  function excluseImage(){
+    setMedia(null);
+    setMediaCompleted(null);
   }
 
   return (
@@ -209,14 +220,14 @@ export default function ChatRoom() {
           <View className="flex-1">
             <MessageList scrollViewRef={scrollViewRef} messages={messages} currentUser={{ userId: user.id }} />
           </View>
-          {image && (
+          {media && (
             <View className="flex-row items-center justify-cente p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
               <Image
-                source={{ uri: image }}
+                source={{ uri: media }}
                 style={{ width: '100%', height: '100%' }}
                 className="rounded-lg"
               />
-              <TouchableOpacity onPress={() => setImage(null)} className="absolute top-0 right-0 rounded-full">
+              <TouchableOpacity onPress={excluseImage} className="absolute top-0 right-0 rounded-full">
                 <AntDesign name="closecircle" size={24} color="#581c87" />
               </TouchableOpacity>
             </View>
@@ -236,11 +247,11 @@ export default function ChatRoom() {
                   <AntDesign name="delete" size={hp(2.7)} color="red" />
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity onPress={pickImage} className="p-2 mr-[4px] rounded-full">
+                <TouchableOpacity onPress={pickMedia} className="p-2 mr-[4px] rounded-full">
                   <Feather name="camera" size={hp(2.7)} color="white" />
                 </TouchableOpacity>
               )}
-              {messageAtual ? (
+              {messageAtual || mediaCompleted ? (
                 <TouchableOpacity onPress={() => sendMessage(null)} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
                   <Feather name="send" size={hp(2.7)} color="black" />
                 </TouchableOpacity>

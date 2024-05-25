@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { FontAwesome } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { Audio, Video } from 'expo-av';
 
 export default function MessageItem({ message, currentUser, toggleFullScreen }) {
   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${message.imageName}`);
@@ -17,6 +17,11 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
 
   const handleImageError = () => {
     setImageUri(fallbackImageUri);
+  };
+
+  const handleVideoError = (error) => {
+    console.error("Erro ao carregar ou reproduzir o vídeo:", error);
+    // Você pode adicionar aqui lógica para exibir uma mensagem de erro ao usuário
   };
 
   useEffect(() => {
@@ -160,7 +165,31 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           </View>
         </TouchableOpacity >
       );
-    } else {
+    } else if (message.imageName && message.imageName.includes(".mp4")) {
+      return (
+        <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row justify-end mb-3 mr-3">
+          <View style={{ width: wp(80) }}>
+            <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
+              <Video
+                source={{ uri: "https://sv2.arquivots.fans/Animes/D/dragon-ball-dublado/01.MP4" }}
+                rate={1.0}
+                volume={1.0}
+                isMuted={true}
+                resizeMode="cover"
+                shouldPlay
+                isLooping
+                style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
+                onError={handleVideoError}
+              />
+              <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
+                {message.message}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity >
+      );
+    }
+    else {
       return (
         <View className="flex-row justify-end mb-3 mr-3">
           <View style={{ width: wp(80) }}>
