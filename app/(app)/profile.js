@@ -46,7 +46,7 @@ export default function Profile() {
             uri = compressedImage.uri;
 
             if (uri) {
-               formData.append('image', {
+               formData.append('file', {
                   uri: uri,
                   name: 'image.jpg',
                   type: 'image/jpeg',

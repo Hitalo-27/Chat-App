@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Keyboard, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import ChatRoomHeader from '../../components/ChatRoomHeader';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import MessageList from '../../components/MessageList';
@@ -25,7 +25,6 @@ export default function ChatRoom() {
   const socket = io('http://192.168.15.11:3000');
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
-  const [audioUri, setAudioUri] = useState(null);
 
   useEffect(() => {
     // Desconecte o socket quando o componente for desmontado
@@ -74,8 +73,8 @@ export default function ChatRoom() {
     }
   };
 
-  async function sendMessage() {
-    if (messageAtual) {
+  async function sendMessage(audioTeste = null) {
+    if (messageAtual || imageCompleted || audioTeste) {
       try {
         let uri = null;
         if (imageCompleted) {
@@ -93,10 +92,16 @@ export default function ChatRoom() {
         const formData = new FormData();
         formData.append('message', messageAtual);
         if (uri) {
-          formData.append('image', {
+          formData.append('file', {
             uri: uri,
             name: 'image.jpg',
             type: 'image/jpeg',
+          });
+        } else if (audioTeste) {
+          formData.append('file', {
+            uri: audioTeste,
+            name: 'audio.m4a',
+            type: 'audio/m4a',
           });
         }
 
@@ -131,8 +136,11 @@ export default function ChatRoom() {
 
         // Atualize a lista de mensagens
         setMessages([...messages, novaMessage]);
+
+        return response.data.message;
       } catch (error) {
         console.log(error.response);
+        return error.response;
         // Trate os erros de forma apropriada, se necessário
       }
     }
@@ -162,14 +170,14 @@ export default function ChatRoom() {
 
   async function stopRecording() {
     setRecording(undefined);
-    await recording.stopAndUnloadAsync();
-    await Audio.setAudioModeAsync(
-      {
-        allowsRecordingIOS: false,
-      }
-    );
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+    });
+    await recording.stopAndUnloadAsync(); // Espera pela conclusão da operação
     const uri = recording.getURI();
-    setAudioUri(uri);
+    console.log('Recording URI:', uri);
+
+    await sendMessage(uri);
   }
 
   async function excluseRecording() {
@@ -181,16 +189,6 @@ export default function ChatRoom() {
       }
     );
 
-    setAudioUri(null);
-  }
-
-  async function playSound() {
-    if (audioUri) {
-      const { sound } = await Audio.Sound.createAsync({ uri: audioUri });
-      await sound.playAsync();
-    } else {
-      console.log('Nenhum áudio gravado para reproduzir.');
-    }
   }
 
   return (
@@ -215,16 +213,6 @@ export default function ChatRoom() {
               </TouchableOpacity>
             </View>
           )}
-
-          {
-            audioUri && (
-              <View className="flex-row items-center justify-cente p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
-                <TouchableOpacity onPress={playSound} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
-                  <Feather name="play" size={hp(2.7)} color="black" />
-                </TouchableOpacity>
-              </View>
-            )
-          }
           <View style={{ marginBottom: hp(2.7) }} className="pt-2">
             <View style={{ backgroundColor: "#1e1e1e" }} className="flex-row mx-3 justify-between bg-white border p-2 border-neutral-600 rounded-full pl-5">
               <TextInput
