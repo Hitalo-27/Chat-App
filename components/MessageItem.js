@@ -8,7 +8,7 @@ import { Audio } from 'expo-av';
 export default function MessageItem({ message, currentUser, toggleFullScreen }) {
   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${message.imageName}`);
   const fallbackImageUri = 'https://media.istockphoto.com/id/1396814518/vector/image-coming-soon-no-photo-no-thumbnail-image-available-vector-illustration.jpg?s=612x612&w=0&k=20&c=hnh2OZgQGhf0b46-J2z7aHbIWwq8HNlSDaNp2wn_iko=';
-  const [audio, setAudio] = useState(`https://5222-2804-7f0-b903-7ca7-6c68-7ef9-1ea7-c427.ngrok-free.app/${message.imageName}`);
+  const [audioUri, setAudioUri] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
@@ -20,12 +20,15 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
   };
 
   useEffect(() => {
+    setAudioUri(`http://192.168.15.11:8080/${message.imageName}`);
+  }, [message]);
+
+  useEffect(() => {
     const loadAudio = async () => {
-      if (audio && audio.includes('.m4a')) {
-        console.log('audio:', audio);
+      if (audioUri && audioUri.includes('.m4a')) {
         try {
           const { sound, status } = await Audio.Sound.createAsync(
-            { uri: audio },
+            { uri: audioUri },
             { shouldPlay: false },
             onPlaybackStatusUpdate
           );
@@ -44,7 +47,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
         soundRef.current.unloadAsync();
       }
     };
-  }, [audio]);
+  }, [audioUri]);
 
   const onPlaybackStatusUpdate = status => {
     if (status.isLoaded) {
@@ -117,7 +120,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
 
 
   if (currentUser?.userId === message?.senderId) {
-    if (message.imageName && message.imageName.includes('.m4a')){
+    if (message.imageName && message.imageName.includes(".m4a")) {
       return (
         <View style={styles.messageRowRight}>
           <View style={styles.messageBoxRight}>
@@ -139,7 +142,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
         </View>
       );
     }
-    else if (message.imageName && message.imageName.includes('.jpg')) {
+    else if (message.imageName && message.imageName.includes(".jpg")) {
       return (
         <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row justify-end mb-3 mr-3">
           <View style={{ width: wp(80) }}>
@@ -171,7 +174,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       );
     }
   } else {
-    if (message.imageName && message.imageName.includes('.m4a')){
+    if (message.imageName && message.imageName.includes(".m4a")) {
       return (
         <View style={styles.messageRowLeft}>
           <View style={styles.messageBoxLeft}>
@@ -192,7 +195,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           </View>
         </View>
       );
-    } if (message.imageName && message.imageName.includes('.jpg')) {
+    } else if (message.imageName && message.imageName.includes(".jpg")) {
       return (
         <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row mb-3 ml-3">
           <View style={{ width: wp(80) }}>

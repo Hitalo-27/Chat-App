@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 
 export default function ChatRoom() {
   const router = useRouter();
@@ -136,11 +137,8 @@ export default function ChatRoom() {
 
         // Atualize a lista de mensagens
         setMessages([...messages, novaMessage]);
-
-        return response.data.message;
       } catch (error) {
         console.log(error.response);
-        return error.response;
         // Trate os erros de forma apropriada, se necessário
       }
     }
@@ -173,11 +171,21 @@ export default function ChatRoom() {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
     });
-    await recording.stopAndUnloadAsync(); // Espera pela conclusão da operação
-    const uri = recording.getURI();
-    console.log('Recording URI:', uri);
+    await recording.stopAndUnloadAsync();
 
-    await sendMessage(uri);
+    const uri = recording.getURI();
+    const mp4Uri = uri.replace('.m4a', '.mp4'); // Renomeando para .mp4
+
+    try {
+      await FileSystem.moveAsync({
+        from: uri,
+        to: mp4Uri,
+      });
+      console.log('Recording URI:', mp4Uri);
+      await sendMessage(mp4Uri);
+    } catch (error) {
+      console.error('Failed to rename and send recording', error);
+    }
   }
 
   async function excluseRecording() {
@@ -233,7 +241,7 @@ export default function ChatRoom() {
                 </TouchableOpacity>
               )}
               {messageAtual ? (
-                <TouchableOpacity onPress={sendMessage} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
+                <TouchableOpacity onPress={() => sendMessage(null)} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
                   <Feather name="send" size={hp(2.7)} color="black" />
                 </TouchableOpacity>
               ) : (
