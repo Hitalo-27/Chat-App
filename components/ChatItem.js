@@ -43,7 +43,8 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
         idLastMessage: item.chatId,
         visualizeLastMessage: item.visualize,
         senderIdLastMessage: item.senderId,
-        groupConversation: groupConversation
+        groupConversation: groupConversation,
+        groupDescription: item.groupDescription,
       }
     });
   }

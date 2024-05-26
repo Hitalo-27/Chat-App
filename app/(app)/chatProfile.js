@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StatusBar, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StatusBar, FlatList, SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../../context/authContext';
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, Feather } from '@expo/vector-icons';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import MembersList from '../../components/MembersList';
-import { AlertNotificationRoot } from 'react-native-alert-notification';
+import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 export default function ChatProfile() {
    const params = useLocalSearchParams();
+   const [imageCompleted, setImageCompleted] = useState(null);
    const [conversation, setConversation] = useState(JSON.parse(params.user));
    const [users, setUsers] = useState([]);
    const router = useRouter();
    const { user, removeUserGroup } = useAuth();
-
+   const [title, setTitle] = useState(conversation.name);
+   const [description, setDescription] = useState(conversation.groupDescription !== 'undefined' ? conversation.groupDescription : '');
+   const [image, setImage] = useState(null);
    const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${conversation ? conversation.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
@@ -35,10 +40,8 @@ export default function ChatProfile() {
          );
 
          setUsers(response.data.message);
-         return;
       } catch (error) {
          console.log(error.response.data);
-         return;
       }
    };
 
@@ -46,8 +49,80 @@ export default function ChatProfile() {
       handleUsers();
    }, [conversation, removeUserGroup]);
 
+   const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+         mediaTypes: ImagePicker.MediaTypeOptions.All,
+         allowsEditing: true,
+         aspect: [4, 3],
+         quality: 1,
+      });
+
+      if (!result.canceled) {
+         setImage(result.assets[0].uri);
+         setImageCompleted(result.assets[0]);
+      }
+   };
+
+   const updateGroup = async () => {
+      try {
+         const formData = new FormData();
+         formData.append('title', title);
+         formData.append('description', description);
+         if (imageCompleted) {
+            uri = imageCompleted.uri;
+
+            // Comprimir a imagem antes de enviá-la
+            const compressedImage = await ImageManipulator.manipulateAsync(
+               uri,
+               [],
+               { compress: 0.7, format: 'jpeg' } // Comprimir a imagem com qualidade de 70%
+            );
+            uri = compressedImage.uri;
+
+            if (uri) {
+               formData.append('file', {
+                  uri: uri,
+                  name: 'image.jpg',
+                  type: 'image/jpeg',
+               });
+            }
+         }
+
+         const response = await axios.put(
+            `http://192.168.15.11:8080/group/update/${conversation.idConversation}`,
+            formData,
+            {
+               headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'Authorization': `Bearer Authorization ${user.token}`
+               }
+            }
+         );
+
+         Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: 'Sucesso!',
+            textBody: "Dados atualizados com sucesso!",
+            button: 'Ok',
+         });
+         return;
+
+      } catch (error) {
+         console.log(error);
+
+         Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Erro!',
+            textBody: "Ocorreu um erro ao atualizar os dados!",
+            button: 'Ok',
+         });
+
+         return;
+      }
+   }
+
    return (
-      <View className="flex-1" style={{ backgroundColor: '#121212' }}>
+      <View style={{ flex: 1, backgroundColor: '#121212' }}>
          <StatusBar style="dark" />
          <Stack.Screen
             options={{
@@ -57,12 +132,12 @@ export default function ChatProfile() {
                   backgroundColor: '#581c87',
                },
                headerLeft: () => (
-                  <View className="flex-row items-center gap-4">
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                      <TouchableOpacity onPress={() => router.back()}>
                         <Entypo name="chevron-left" size={hp(4)} color="#e3e3e3" />
                      </TouchableOpacity>
-                     <View className="flex-row items-center gap-3">
-                        <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
+                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                        <Text style={{ fontSize: hp(2.5), fontWeight: 'bold', color: '#FFFFFF' }}>
                            {conversation.name || 'Usuário'}
                         </Text>
                      </View>
@@ -70,56 +145,93 @@ export default function ChatProfile() {
                ),
             }}
          />
-         <View className="items-center">
-            <Image
-               source={{ uri: imageUri }}
-               style={{ height: hp(15), width: hp(15), borderRadius: 100, marginTop: hp(10) }}
-               onError={handleImageError}
-            />
+         <View style={{ alignItems: 'center' }}>
+            {conversation.groupConversation === 'true' ? (
+               <>
+                  <TouchableOpacity onPress={updateGroup} style={{ backgroundColor: '#581c87', position: 'absolute', right: 20, padding: 10, borderRadius: 10, marginTop: hp(5) }}>
+                     <Text style={{ fontSize: hp(2), color: '#FFFFFF' }}>Salvar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={pickImage}>
+                     <Image
+                        source={image ? { uri: image } : { uri: imageUri }}
+                        style={{ height: hp(20), width: hp(20), borderRadius: 100, marginTop: hp(5) }}
+                        onError={handleImageError}
+                     />
+                     <View style={{ position: 'absolute', bottom: 0, right: 0, padding: 10, borderRadius: 100, backgroundColor: '#581c87' }}>
+                        <Feather name="camera" size={24} color="white" />
+                     </View>
+                  </TouchableOpacity>
+               </>
+            ) : (
+               <Image
+                  source={{ uri: imageUri }}
+                  style={{ height: hp(15), width: hp(15), borderRadius: 100, marginTop: hp(10) }}
+                  onError={handleImageError}
+               />
+            )}
          </View>
 
-         <View>
-            <View className="gap-2">
-               <View className="flex-row items-center justify-center gap-4">
-                  <Text style={{ fontSize: hp(3) }} className="font-medium text-neutral-100">
+         <View style={{ marginBottom: 10, marginTop: 20 }}>
+            {conversation.groupConversation === 'true' ? (
+               <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                     <TextInput
+                        value={title}
+                        onChangeText={setTitle}
+                        style={{ fontSize: hp(3), fontWeight: 'bold', color: '#FFFFFF' }}
+                        placeholder="Titulo"
+                        placeholderTextColor={'gray'}
+                     />
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                     <TextInput
+                        value={description}
+                        onChangeText={setDescription}
+                        style={{ fontSize: hp(2), fontWeight: 'semi-bold', color: '#FFFFFF' }}
+                        placeholder="Descrição"
+                        placeholderTextColor={'gray'}
+                     />
+                  </View>
+               </>
+            ) : (
+               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: hp(3), fontWeight: 'bold', color: '#FFFFFF' }}>
                      {conversation.name || 'Usuário'}
                   </Text>
                </View>
-               {conversation.groupConversation === 'true' ? (
-                  <View className="flex-row items-center justify-center gap-4">
-                     <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
-                        Total de Membros: {users.length}
-                     </Text>
-                  </View>
-               ) : (
-                  <View className="flex-row items-center justify-center gap-4">
-                     <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
-                        Email: {conversation.email || 'Sem Email'}
-                     </Text>
-                  </View>
-               )}
-            </View>
+            )}
+            {conversation.groupConversation === 'true' ? (
+               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: hp(2), color: '#FFFFFF' }}>
+                     Total de Membros: {users.length}
+                  </Text>
+               </View>
+            ) : (
+               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: hp(2), color: '#FFFFFF' }}>
+                     Email: {conversation.email || 'Sem Email'}
+                  </Text>
+               </View>
+            )}
          </View>
 
          {conversation.groupConversation === 'true' && (
-            <View className="flex-1 p-4">
-               <FlatList
-                  data={users}
-                  contentContainerStyle={{ flex: 1, paddingVertical: 25, backgroundColor: '#121212' }}
-                  keyExtractor={item => Math.random()}
-                  showsVerticalScrollIndicator={true}
-                  renderItem={({ item, index }) =>
-                     <MembersList
-                        noBorder={index + 1 == users.length}
-                        router={router}
-                        item={item}
-                        index={index}
-                        conversationId={conversation.idConversation}
-                     />
-                  }
-               />
-            </View>
+            <FlatList
+               data={users}
+               keyExtractor={(item, index) => index.toString()}
+               showsVerticalScrollIndicator={true}
+               renderItem={({ item, index }) =>
+                  <MembersList
+                     noBorder={index + 1 === users.length}
+                     router={router}
+                     item={item}
+                     index={index}
+                     conversationId={conversation.idConversation}
+                  />
+               }
+            />
          )}
+
          <AlertNotificationRoot colors={[{
             label: 'white',
             card: '#121212',
@@ -130,4 +242,5 @@ export default function ChatProfile() {
          }]} />
       </View>
    );
+
 }
