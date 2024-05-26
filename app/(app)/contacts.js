@@ -38,9 +38,15 @@ export default function Contacts() {
    }
 
    return (
-      <View className="flex-1 bg-white">
+      <View className="flex-1" style={{ backgroundColor: '#121212' }}>
          <StatusBar style="dark" />
-         <ChatList users={users} isConversation={false} />
+         {users.length > 0 ? (
+            <ChatList users={users} isConversation={false} />
+         ) : (
+            <View style={{ flex: 1, paddingTop: hp('40%'), alignItems: 'center' }}>
+               <Text style={{ fontSize: 25 }} className="text-purple-800 font-bold">Nenhum contato encontrado!</Text>
+            </View>
+         )}
       </View>
    );
 }

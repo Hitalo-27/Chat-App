@@ -8,6 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
   const [messages, setMessages] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [removeUserGroup, setRemoveUserGroup] = useState([]);
   const JWT_SECRET = "OpI3TaszkA8h6xJkNokRXHFpM7s5TdDzmGWg1YVJPz57lWWLvpmMhmsF9rmIm5U8PM8tr4Xk6E9Bm0ed8H592wJX9bqolPdiACni6sccm1f7o6ejyud8Xid0pGtLIF4Z13qsec7vtuK9zpmspCBMzPlk4nabJuwUfyPykZlSsFPdym5XE3KuxGR3KJW7PgKYFqewgzh7";
 
   useEffect(() => {
@@ -129,7 +130,7 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isAuthenticated, login, logout, register, getMessages, messages, setMessages, selectedUsers, setSelectedUsers }}>
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated, login, logout, register, getMessages, messages, setMessages, selectedUsers, setSelectedUsers, removeUserGroup, setRemoveUserGroup }}>
       {children}
     </AuthContext.Provider>
   );

@@ -82,11 +82,18 @@ export default function CreateGroup() {
             );
          }));
 
-         Dialog.show({
-            type: ALERT_TYPE.SUCCESS,
-            title: 'Sucesso!',
-            textBody: "Grupo criado com sucesso!",
-            button: 'Ok',
+         router.push({
+            pathname: 'chatRoom',
+            params: {
+               id: responseCreate.data.message.conversationId.id,
+               name: title,
+               imageName: responseCreate.data.message.imageName,
+               idConversation: responseCreate.data.message.conversationId.id,
+               idLastMessage: null,
+               visualizeLastMessage: null,
+               senderIdLastMessage: null,
+               groupConversation: true,
+            }
          });
          return;
 
@@ -193,7 +200,7 @@ export default function CreateGroup() {
                         ) : (
                            <TouchableOpacity onPress={handleCreateGroup} style={{ height: hp(6.5) }} className="bg-purple-900 rounded-xl justify-center items-center">
                               <Text style={{ fontSize: hp(2.7) }} className="text-white font-bold tracking-wider text-center bg-primary-500 rounded--2xl py-2 px-4">
-                                 Concluir
+                                 Criar
                               </Text>
                            </TouchableOpacity>
                         )

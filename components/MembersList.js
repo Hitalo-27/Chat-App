@@ -14,7 +14,7 @@ import { MenuItem } from "./CustomMenuItems";
 import axios from 'axios';
 
 export default function MembersList({ item, router, noBorder, conversationId }) {
-  const { user } = useAuth();
+  const { user, removeUserGroup, setRemoveUserGroup } = useAuth();
 
   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${item ? item.userImageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
@@ -26,8 +26,6 @@ export default function MembersList({ item, router, noBorder, conversationId }) 
   const handleExcluir = async () => {
     try {
 
-      console.log(conversationId);
-
       const response = await axios.delete(
         `http://192.168.15.11:8080/group/${conversationId}/remove/${item.userId}`,
         {
@@ -37,12 +35,7 @@ export default function MembersList({ item, router, noBorder, conversationId }) 
         }
       );
 
-      Dialog.show({
-        type: ALERT_TYPE.SUCCESS,
-        title: 'Sucesso!',
-        textBody: 'Usuário removido com sucesso!',
-        button: 'Ok',
-      });
+      setRemoveUserGroup(["teste"]);
 
     }
     catch (error) {

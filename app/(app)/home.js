@@ -56,7 +56,7 @@ export default function Home() {
    }
 
    return (
-      <View className="flex-1 bg-white">
+      <View className="flex-1" style={{ backgroundColor: '#121212' }}>
          <StatusBar style="dark" />
          <ChatList users={conversation} />
       </View>

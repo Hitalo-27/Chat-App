@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ScrollView, Modal, Image, View, Text, TouchableOpacity, Dimensions, StyleSheet } from 'react-native';
 import MessageItem from './MessageItem';
 import ImageZoom from 'react-native-image-pan-zoom';
@@ -7,14 +7,15 @@ import { Video } from 'expo-av';
 import Slider from '@react-native-community/slider';
 
 export default function MessageList({ scrollViewRef, messages, currentUser }) {
-
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [imageModal, setImageModal] = useState('');
   const [messageModal, setMessageModal] = useState('');
   const [isPlaying, setIsPlaying] = useState(true);
   const [sliderValue, setSliderValue] = useState(0);
+  const [duration, setDuration] = useState(0);
   const videoRef = useRef(null);
-  const [isSliding, setIsSliding] = useState(false); // Para evitar atualizações de posição do vídeo enquanto estivermos deslizando o slider
+  const [isSliding, setIsSliding] = useState(false);
+  const [showControls, setShowControls] = useState(false);
 
   function toggleFullScreen(imageModal, messageModal) {
     setShowFullScreen(!showFullScreen);
@@ -59,6 +60,19 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
+  const toggleControls = () => {
+    setShowControls(!showControls);
+  };
+
+  const handlePlaybackStatusUpdate = (status) => {
+    if (!isSliding) {
+      setSliderValue(status.positionMillis);
+    }
+    if (status.durationMillis) {
+      setDuration(status.durationMillis);
+    }
+  };
+
   return (
     <>
       <ScrollView
@@ -66,15 +80,11 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 10 }}
       >
-        {
-          messages ? (
-            messages.map((message, index) => {
-              return (
-                <MessageItem key={index} message={message} currentUser={currentUser} toggleFullScreen={toggleFullScreen} />
-              )
-            })
-          ) : null
-        }
+        {messages ? (
+          messages.map((message, index) => (
+            <MessageItem key={index} message={message} currentUser={currentUser} toggleFullScreen={toggleFullScreen} />
+          ))
+        ) : null}
       </ScrollView>
 
       <Modal visible={showFullScreen} transparent={true} onRequestClose={onClose}>
@@ -82,66 +92,63 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <MaterialCommunityIcons name="close-thick" size={30} color="white" />
           </TouchableOpacity>
-          { imageModal.includes('.jpg') || imageModal.includes('.png') ? (
+          {imageModal.includes('.jpg') || imageModal.includes('.png') ? (
             <ImageZoom
               cropWidth={Dimensions.get('window').width}
               cropHeight={Dimensions.get('window').height}
               imageWidth={Dimensions.get('window').width}
               imageHeight={Dimensions.get('window').height}
             >
-              <Image
-                source={{ uri: imageModal }}
-                style={styles.image}
-                resizeMode='contain'
-              />
+              <Image source={{ uri: imageModal }} style={styles.image} resizeMode="contain" />
             </ImageZoom>
           ) : (
-            <>
-            <Video
-              ref={videoRef}
-              source={{ uri: "https://sv2.arquivots.fans/Animes/D/dragon-ball-dublado/01.MP4" }}
-              rate={1.0}
-              volume={1.0}
-              isMuted={false}
-              resizeMode="contain"
-              shouldPlay
-              isLooping
-              style={styles.image}
-              onPlaybackStatusUpdate={(status) => {
-                if (!isSliding) { // Atualizar o slider apenas se não estivermos deslizando
-                  setSliderValue(status.positionMillis);
-                }
-              }}
-            />
-            <View style={styles.controlsContainer}>
-              <View style={styles.controls}>
-                <TouchableOpacity onPress={() => seekTo(Math.max(sliderValue - 10000, 0))}>
-                  <MaterialCommunityIcons name="rewind-10" size={30} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={togglePlayPause}>
-                  <MaterialCommunityIcons name={isPlaying ? "pause" : "play"} size={30} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => seekTo(Math.min(sliderValue + 10000, videoRef.current ? videoRef.current.getStatusAsync().durationMillis : 0))}>
-                  <MaterialCommunityIcons name="fast-forward-10" size={30} color="white" />
-                </TouchableOpacity>
-              </View>
-              <Slider
-                style={{ width: '80%', marginTop: 10 }}
-                minimumValue={0}
-                maximumValue={videoRef.current ? videoRef.current.getStatusAsync().durationMillis : 0}
-                minimumTrackTintColor="#FFFFFF"
-                maximumTrackTintColor="#000000"
-                thumbTintColor="#FFFFFF"
-                value={sliderValue}
-                onValueChange={onSliderValueChange}
-                onSlidingStart={onSlidingStart}
-                onSlidingComplete={onSlidingComplete}
+            <TouchableOpacity style={styles.videoWrapper} onPress={toggleControls}>
+              <Video
+                ref={videoRef}
+                source={{ uri: "https://sv2.arquivots.fans/Animes/D/dragon-ball-dublado/01.MP4" }}
+                rate={1.0}
+                volume={1.0}
+                isMuted={false}
+                resizeMode="contain"
+                shouldPlay
+                isLooping
+                style={styles.video}
+                onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
               />
-              <Text style={styles.duration}>
-                {formatTime(sliderValue)} / {formatTime(videoRef.current ? videoRef.current.getStatusAsync().durationMillis : 0)}
-              </Text>
-            </View>
-            </>
+              {showControls && (
+                <View style={styles.controlsContainer}>
+                  <View style={styles.controls}>
+                    <TouchableOpacity onPress={() => seekTo(Math.max(sliderValue - 10000, 0))}>
+                      <MaterialCommunityIcons name="rewind-10" size={40} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={togglePlayPause}>
+                      <MaterialCommunityIcons name={isPlaying ? "pause" : "play"} size={40} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={async () => {
+                      const status = await videoRef.current.getStatusAsync();
+                      seekTo(Math.min(sliderValue + 10000, status.durationMillis));
+                    }}>
+                      <MaterialCommunityIcons name="fast-forward-10" size={40} color="white" />
+                    </TouchableOpacity>
+                  </View>
+                  <Slider
+                    style={{ width: '80%', marginTop: 10 }}
+                    minimumValue={0}
+                    maximumValue={duration}
+                    minimumTrackTintColor="#FFFFFF"
+                    maximumTrackTintColor="#000000"
+                    thumbTintColor="#FFFFFF"
+                    value={sliderValue}
+                    onValueChange={onSliderValueChange}
+                    onSlidingStart={onSlidingStart}
+                    onSlidingComplete={onSlidingComplete}
+                  />
+                  <Text style={styles.duration}>
+                    {formatTime(sliderValue)} / {formatTime(duration)}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
           )}
           <Text style={styles.messageModal}>{messageModal}</Text>
         </View>
@@ -167,6 +174,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  videoWrapper: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+  },
   messageModal: {
     color: 'white',
     fontSize: 16,
@@ -178,14 +195,15 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   controls: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 10,
     padding: 10,
+    width: '70%',
   },
   duration: {
     color: 'white',

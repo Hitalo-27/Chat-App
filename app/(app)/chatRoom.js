@@ -15,6 +15,9 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
+// Inicialize o socket fora do componente para garantir que ele seja inicializado apenas uma vez
+const socket = io('http://192.168.15.11:3000');
+
 export default function ChatRoom() {
   const router = useRouter();
   const [media, setMedia] = useState(null);
@@ -23,20 +26,8 @@ export default function ChatRoom() {
   const { user, getMessages, messages, setMessages } = useAuth();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef(null);
-  const socket = io('https://server-chat-app-nfhd.onrender.com');
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
-
-  useEffect(() => {
-    // Desconecte o socket quando o componente for desmontado
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  const fetchMessages = async () => {
-    await getMessages(user, params);
-  }
 
   useEffect(() => {
     fetchMessages();
@@ -45,10 +36,23 @@ export default function ChatRoom() {
       'keyboardDidShow', updateScrollView
     );
 
+    // Adicione o listener para a mensagem
+    const handleMessage = (data) => {
+      fetchMessages();
+    };
+
+    socket.on('message', handleMessage);
+
     return () => {
       keyboardDidShowListener.remove();
+      // Remova o listener ao desmontar o componente
+      socket.off('message', handleMessage);
     };
   }, []);
+
+  const fetchMessages = async () => {
+    await getMessages(user, params);
+  }
 
   useEffect(() => {
     updateScrollView();
@@ -113,8 +117,18 @@ export default function ChatRoom() {
           });
         }
 
+        let typeRequest = "";
+        let idChat = "";
+        if (params.groupConversation === "true") {
+          typeRequest = "group";
+          idChat = params.idConversation;
+        } else {
+          typeRequest = "chat";
+          idChat = params.id;
+        }
+
         const response = await axios.post(
-          `http://192.168.15.11:8080/chat/create/${params.id}`,
+          `http://192.168.15.11:8080/${typeRequest}/create/${idChat}`,
           formData,
           {
             headers: {
@@ -145,16 +159,10 @@ export default function ChatRoom() {
         // Atualize a lista de mensagens
         setMessages([...messages, novaMessage]);
       } catch (error) {
-        console.log(error.response);
-        // Trate os erros de forma apropriada, se necessário
+        console.log(error);
       }
     }
   }
-
-  // Quando uma nova mensagem é recebida do servidor, atualize a interface do usuário
-  socket.on('message', (data) => {
-    fetchMessages();
-  });
 
   async function startRecording() {
     try {
@@ -205,7 +213,7 @@ export default function ChatRoom() {
     );
   }
 
-  function excluseImage(){
+  function excluseImage() {
     setMedia(null);
     setMediaCompleted(null);
   }
@@ -221,7 +229,7 @@ export default function ChatRoom() {
             <MessageList scrollViewRef={scrollViewRef} messages={messages} currentUser={{ userId: user.id }} />
           </View>
           {media && (
-            <View className="flex-row items-center justify-cente p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
+            <View className="flex-row justify-center p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
               <Image
                 source={{ uri: media }}
                 style={{ width: '100%', height: '100%' }}
@@ -239,7 +247,7 @@ export default function ChatRoom() {
                 onChangeText={setMessageAtual}
                 placeholder="Digite uma mensagem..."
                 placeholderTextColor="#e3e3e3"
-                style={{ fontSize: hp(2), backgroundColor: "tranparent", color: "#e3e3e3" }}
+                style={{ fontSize: hp(2), backgroundColor: "transparent", color: "#e3e3e3" }}
                 className="flex-1 mr-2"
               />
               {recording ? (

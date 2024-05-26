@@ -38,8 +38,8 @@ export default function ChatRoomHeader({ router, user }) {
         ),
         headerRight: () => (
           <View className="flex-row items-center gap-4">
-            <Ionicons name="call" size={hp(2.8)} color="#e3e3e3" />
-            <Ionicons name="videocam" size={hp(2.8)} color="#e3e3e3" />
+            {/* <Ionicons name="call" size={hp(2.8)} color="#e3e3e3" />
+            <Ionicons name="videocam" size={hp(2.8)} color="#e3e3e3" /> */}
           </View>
         ),
       }}

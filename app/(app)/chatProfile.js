@@ -14,7 +14,7 @@ export default function ChatProfile() {
    const [conversation, setConversation] = useState(JSON.parse(params.user));
    const [users, setUsers] = useState([]);
    const router = useRouter();
-   const { user } = useAuth();
+   const { user, removeUserGroup, setRemoveUserGroup } = useAuth();
 
    const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${conversation ? conversation.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
@@ -46,7 +46,9 @@ export default function ChatProfile() {
 
    useEffect(() => {
       handleUsers();
-   }, [conversation]);
+      setRemoveUserGroup([]);
+      console.log("aqui2");
+   }, [conversation || removeUserGroup]);
 
    return (
       <View className="flex-1" style={{ backgroundColor: '#121212' }}>

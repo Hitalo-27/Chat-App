@@ -16,8 +16,9 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
   };
 
   var id = item.id;
-  var name = item.name;
+  var name = item.name ? item.name : item.groupName;
   var imageName = item.recipientImageName;
+  var groupConversation = item.groupName ? true : false;
 
   if (!id && !name) {
     if (!user) return;
@@ -31,8 +32,6 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
   }
 
   const openChatRoom = () => {
-
-    console.log(item);
     router.push({
       pathname: 'chatRoom',
       params: {
@@ -43,6 +42,7 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
         idLastMessage: item.chatId,
         visualizeLastMessage: item.visualize,
         senderIdLastMessage: item.senderId,
+        groupConversation: groupConversation
       }
     });
   }
@@ -62,13 +62,13 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
       <View className="flex-1 gap-1">
         <View className="flex-row justify-between">
           <Text style={{ fontSize: hp(1.8) }} className="font-semibold text-neutral-50">{name ? name : "Usuário"}</Text>
-          {isConversation && !item.visualize && item.senderId !== user.id ? (
+          {isConversation && !item.visualize && item.senderId !== user?.id ? (
             <View className="flex-row items-center">
               <MaterialIcons name="notifications-on" size={24} color="#e3e3e3" />
             </View>
           ) : null}
         </View>
-        <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email}</Text>
+        <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email ? item.email : "Sem mensagens"}</Text>
       </View>
 
     </TouchableOpacity>
