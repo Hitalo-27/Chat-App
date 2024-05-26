@@ -4,15 +4,22 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Stack } from 'expo-router';
+import { useAuth } from '../context/authContext';
 
 export default function ChatRoomHeader({ router, user }) {
   user = user.user;
   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${user ? user.imageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+  const { setMessages } = useAuth();
 
   const handleImageError = () => {
     setImageUri(fallbackImageUri);
   };
+
+  const backChats = () => {
+    setMessages([]);
+    router.back();
+  }
 
   return (
     <Stack.Screen
@@ -21,7 +28,7 @@ export default function ChatRoomHeader({ router, user }) {
         headerShadowVisible: false,
         headerLeft: () => (
           <View className="flex-row items-center gap-4" >
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={backChats}>
               <Entypo name="chevron-left" size={hp(4)} color="#e3e3e3" />
             </TouchableOpacity>
             <TouchableOpacity className="flex-row items-center gap-3" onPress={() => router.push({pathname: 'chatProfile', params: { user: JSON.stringify(user) }})}>

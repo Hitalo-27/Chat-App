@@ -14,7 +14,7 @@ import { MenuItem } from "./CustomMenuItems";
 import axios from 'axios';
 
 export default function MembersList({ item, router, noBorder, conversationId }) {
-  const { user, removeUserGroup, setRemoveUserGroup } = useAuth();
+  const { user, removeUserGroupFunc } = useAuth();
 
   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${item ? item.userImageName : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
@@ -35,7 +35,7 @@ export default function MembersList({ item, router, noBorder, conversationId }) 
         }
       );
 
-      setRemoveUserGroup(["teste"]);
+      await removeUserGroupFunc();
 
     }
     catch (error) {
@@ -76,7 +76,7 @@ export default function MembersList({ item, router, noBorder, conversationId }) 
           <View className="flex-row justify-between">
             <Text style={{ fontSize: hp(1.8) }} className="font-semibold text-neutral-50">{item.name ? item.name : "Usuário"}</Text>
           </View>
-          <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email}</Text>
+          <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.email ? item.email : "Email"}</Text>
         </View>
       </MenuTrigger>
       <MenuOptions

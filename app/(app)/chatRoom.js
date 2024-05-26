@@ -229,7 +229,7 @@ export default function ChatRoom() {
             <MessageList scrollViewRef={scrollViewRef} messages={messages} currentUser={{ userId: user.id }} />
           </View>
           {media && (
-            <View className="flex-row justify-center p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
+            <View className="flex-row items-center justify-center p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>
               <Image
                 source={{ uri: media }}
                 style={{ width: '100%', height: '100%' }}

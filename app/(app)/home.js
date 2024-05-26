@@ -5,6 +5,10 @@ import ChatList from '../../components/ChatList';
 import axios from 'axios';
 import { useRouter } from "expo-router";
 import { useAuth } from '../../context/authContext';
+import io from 'socket.io-client';
+
+// Inicialize o socket fora do componente para garantir que ele seja inicializado apenas uma vez
+const socket = io('http://192.168.15.11:3000');
 
 export default function Home() {
    const [conversation, setConversation] = useState([]);
@@ -18,6 +22,12 @@ export default function Home() {
       }
 
       fetchConversation();
+
+      const handleMessage = (data) => {
+         fetchConversation();
+      };
+      
+      socket.on('message', handleMessage);
 
       if (!messages) {
          router.replace("contacts");

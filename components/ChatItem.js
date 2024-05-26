@@ -37,6 +37,7 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
       params: {
         id: id,
         name: name,
+        email: item.email,
         imageName: imageName,
         idConversation: item.conversationId ? item.conversationId : null,
         idLastMessage: item.chatId,
@@ -62,13 +63,13 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
       <View className="flex-1 gap-1">
         <View className="flex-row justify-between">
           <Text style={{ fontSize: hp(1.8) }} className="font-semibold text-neutral-50">{name ? name : "Usuário"}</Text>
-          {isConversation && !item.visualize && item.senderId !== user?.id ? (
+          {isConversation && !item.visualize && item.senderId !== user?.id && item.chatId != 0 ? (
             <View className="flex-row items-center">
               <MaterialIcons name="notifications-on" size={24} color="#e3e3e3" />
             </View>
           ) : null}
         </View>
-        <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email ? item.email : "Sem mensagens"}</Text>
+        <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email ? item.email : item.chatId!=0 ? (<MaterialIcons name="perm-media" size={20} color="#d4d4d4" /> ) : "Sem Conversa"}</Text>
       </View>
 
     </TouchableOpacity>

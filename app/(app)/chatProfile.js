@@ -14,7 +14,7 @@ export default function ChatProfile() {
    const [conversation, setConversation] = useState(JSON.parse(params.user));
    const [users, setUsers] = useState([]);
    const router = useRouter();
-   const { user, removeUserGroup, setRemoveUserGroup } = useAuth();
+   const { user, removeUserGroup } = useAuth();
 
    const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${conversation ? conversation.imageName : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
@@ -35,20 +35,16 @@ export default function ChatProfile() {
          );
 
          setUsers(response.data.message);
-
          return;
       } catch (error) {
          console.log(error.response.data);
-
          return;
       }
    };
 
    useEffect(() => {
       handleUsers();
-      setRemoveUserGroup([]);
-      console.log("aqui2");
-   }, [conversation || removeUserGroup]);
+   }, [conversation, removeUserGroup]);
 
    return (
       <View className="flex-1" style={{ backgroundColor: '#121212' }}>
@@ -67,7 +63,7 @@ export default function ChatProfile() {
                      </TouchableOpacity>
                      <View className="flex-row items-center gap-3">
                         <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
-                           Perfil
+                           {conversation.name || 'Usuário'}
                         </Text>
                      </View>
                   </View>
@@ -89,44 +85,41 @@ export default function ChatProfile() {
                      {conversation.name || 'Usuário'}
                   </Text>
                </View>
-               <View className="flex-row items-center justify-center gap-4">
-                  <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
-                     {conversation.email || 'Email'}
-                  </Text>
-               </View>
-               <View className="flex-row items-center justify-center gap-4">
-                  <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
-                     {conversation.description || 'Sem descrição'}
-                  </Text>
-               </View>
+               {conversation.groupConversation === 'true' ? (
+                  <View className="flex-row items-center justify-center gap-4">
+                     <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
+                        Total de Membros: {users.length}
+                     </Text>
+                  </View>
+               ) : (
+                  <View className="flex-row items-center justify-center gap-4">
+                     <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
+                        Email: {conversation.email || 'Sem Email'}
+                     </Text>
+                  </View>
+               )}
             </View>
          </View>
 
-         {/* membros */}
-         <View className="gap-2">
-            <View className="flex-row items-center justify-center gap-4">
-               <Text style={{ fontSize: hp(2) }} className="font-medium text-neutral-100">
-                  Membros: {users.length}
-               </Text>
+         {conversation.groupConversation === 'true' && (
+            <View className="flex-1 p-4">
+               <FlatList
+                  data={users}
+                  contentContainerStyle={{ flex: 1, paddingVertical: 25, backgroundColor: '#121212' }}
+                  keyExtractor={item => Math.random()}
+                  showsVerticalScrollIndicator={true}
+                  renderItem={({ item, index }) =>
+                     <MembersList
+                        noBorder={index + 1 == users.length}
+                        router={router}
+                        item={item}
+                        index={index}
+                        conversationId={conversation.idConversation}
+                     />
+                  }
+               />
             </View>
-         </View>
-         <View className="flex-1">
-            <FlatList
-               data={users}
-               contentContainerStyle={{ flex: 1, paddingVertical: 25, backgroundColor: '#121212' }}
-               keyExtractor={item => Math.random()}
-               showsVerticalScrollIndicator={true}
-               renderItem={({ item, index }) =>
-                  <MembersList
-                     noBorder={index + 1 == users.length}
-                     router={router}
-                     item={item}
-                     index={index}
-                     conversationId={conversation.idConversation}
-                  />
-               }
-            />
-         </View>
+         )}
          <AlertNotificationRoot colors={[{
             label: 'white',
             card: '#121212',

@@ -21,7 +21,6 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
 
   const handleVideoError = (error) => {
     console.error("Erro ao carregar ou reproduzir o vídeo:", error);
-    // Você pode adicionar aqui lógica para exibir uma mensagem de erro ao usuário
   };
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           soundRef.current = sound;
           setDuration(status.durationMillis);
         } catch (error) {
-          console.error("Error loading audio:", error);
+          console.log("Error loading audio:", error);
         }
       }
     };
@@ -228,7 +227,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       return (
         <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row mb-3 ml-3">
           <View style={{ width: wp(80) }}>
-            <View className="flex self-start p-2 rounded-2xl bg-purple-800 border border-purple-900">
+            <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
               <Image
                 source={{ uri: imageUri }}
                 style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
@@ -242,10 +241,33 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           </View>
         </TouchableOpacity >
       );
+    } else if (message.imageName && message.imageName.includes(".mp4")) {
+      return (
+        <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row mb-3 ml-3">
+          <View style={{ width: wp(80) }}>
+            <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+              <Video
+                source={{ uri: "https://sv2.arquivots.fans/Animes/D/dragon-ball-dublado/01.MP4" }}
+                rate={1.0}
+                volume={1.0}
+                isMuted={true}
+                resizeMode="cover"
+                shouldPlay
+                isLooping
+                style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
+                onError={handleVideoError}
+              />
+              <Text style={{ fontSize: hp(1.9) }} className="text-white">
+                {message.message}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity >
+      );
     } else {
       return (
         <View style={{ width: wp(80) }} className="ml-3 mb-3">
-          <View className="flex self-start p-3 rounded-2xl bg-purple-800 border border-purple-900">
+          <View className="flex self-start p-3 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
             <Text style={{ fontSize: hp(1.9) }} className="text-white">
               {message.message}
             </Text>

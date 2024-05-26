@@ -8,7 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
   const [messages, setMessages] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [removeUserGroup, setRemoveUserGroup] = useState([]);
+  const [removeUserGroup, setRemoveUserGroup] = useState(false);
   const JWT_SECRET = "OpI3TaszkA8h6xJkNokRXHFpM7s5TdDzmGWg1YVJPz57lWWLvpmMhmsF9rmIm5U8PM8tr4Xk6E9Bm0ed8H592wJX9bqolPdiACni6sccm1f7o6ejyud8Xid0pGtLIF4Z13qsec7vtuK9zpmspCBMzPlk4nabJuwUfyPykZlSsFPdym5XE3KuxGR3KJW7PgKYFqewgzh7";
 
   useEffect(() => {
@@ -18,6 +18,15 @@ export const AuthContextProvider = ({ children }) => {
       setIsAuthenticated(false);
     }
   }, [user]);
+
+  const removeUserGroupFunc = async () => {
+    try {
+      setRemoveUserGroup(!removeUserGroup);
+    }
+    catch (error) {
+      console.log(error.response);
+    }
+  }
 
   const login = async (email, password) => {
     try {
@@ -72,12 +81,40 @@ export const AuthContextProvider = ({ children }) => {
       const user = decodeToken(response.data.message.token);
       user.token = response.data.message.token;
       setUser(user);
-      
+
       return response.data;
     } catch (error) {
       return error.response.data;
     }
-}
+  }
+
+  // Função assíncrona para verificar se a mensagem foi visualizada
+  async function checkMessages(response) {
+    for (const message of response.data.message) {
+      if (parseInt(message.senderId) !== parseInt(user.id)) {
+        if (!message.visualize) {
+          try {
+            await axios.put(
+              `http://192.168.15.11:8080/chat/visualize/${message.id}`,
+              null,
+              {
+                headers: {
+                  'Authorization': `Bearer Authorization ${user.token}`
+                }
+              }
+            );
+
+            message.visualize = true;
+          } catch (error) {
+            console.error('Erro ao atualizar a visualização da mensagem:', error.response.data);
+            
+          }
+        }
+      }
+    }
+
+    return response;
+  }
 
   const getMessages = async (user, params) => {
     try {
@@ -96,8 +133,8 @@ export const AuthContextProvider = ({ children }) => {
         params.idConversation = response.data.message.conversationId;
       }
 
-      if(params.idLastMessage){
-        if(parseInt(params.senderIdLastMessage) !== parseInt(user.id)){
+      if (params.idLastMessage) {
+        if (parseInt(params.senderIdLastMessage) !== parseInt(user.id)) {
           await axios.put(
             `http://192.168.15.11:8080/chat/visualize/${params.idLastMessage}`,
             null,
@@ -109,7 +146,7 @@ export const AuthContextProvider = ({ children }) => {
           );
         }
       }
-      
+
       response = await axios.get(
         `http://192.168.15.11:8080/chat/messages/${params.idConversation}`,
         {
@@ -120,9 +157,11 @@ export const AuthContextProvider = ({ children }) => {
         }
       );
 
-      setMessages(response.data.message);
+      let messagesAtualizadas = await checkMessages(response);
 
-      return response.data.message;
+      setMessages(messagesAtualizadas.data.message);
+
+      return messagesAtualizadas;
     } catch (error) {
       setMessages([]);
       return [];
@@ -130,7 +169,7 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isAuthenticated, login, logout, register, getMessages, messages, setMessages, selectedUsers, setSelectedUsers, removeUserGroup, setRemoveUserGroup }}>
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated, login, logout, register, getMessages, messages, setMessages, selectedUsers, setSelectedUsers, removeUserGroup, setRemoveUserGroup, removeUserGroupFunc }}>
       {children}
     </AuthContext.Provider>
   );
