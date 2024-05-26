@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ScrollView, Modal, Image, View, Text, TouchableOpacity, Dimensions, StyleSheet } from 'react-native';
+import { ScrollView, Modal, Image, View, Text, TouchableOpacity, Dimensions, StyleSheet, ActivityIndicator } from 'react-native';
 import MessageItem from './MessageItem';
 import ImageZoom from 'react-native-image-pan-zoom';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [sliderValue, setSliderValue] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isLoadingVideo, setIsLoadingVideo] = useState(false);
   const videoRef = useRef(null);
   const [isSliding, setIsSliding] = useState(false);
   const [showControls, setShowControls] = useState(false);
@@ -21,6 +22,7 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
     setShowFullScreen(!showFullScreen);
     setImageModal(imageModal);
     setMessageModal(messageModal);
+    setIsLoadingVideo(true); // Ativa o loading quando a modal é aberta
   }
 
   const onClose = () => {
@@ -70,6 +72,7 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
     }
     if (status.durationMillis) {
       setDuration(status.durationMillis);
+      setIsLoadingVideo(false); // Marca o vídeo como carregado quando a duração é definida
     }
   };
 
@@ -92,6 +95,13 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <MaterialCommunityIcons name="close-thick" size={30} color="white" />
           </TouchableOpacity>
+
+          {isLoadingVideo && ( // Renderiza a tela de loading apenas quando o vídeo está sendo carregado
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+            </View>
+          )}
+
           {imageModal.includes('.jpg') || imageModal.includes('.png') ? (
             <ImageZoom
               cropWidth={Dimensions.get('window').width}
@@ -105,7 +115,7 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
             <TouchableOpacity style={styles.videoWrapper} onPress={toggleControls}>
               <Video
                 ref={videoRef}
-                source={{ uri: "https://sv2.arquivots.fans/Animes/D/dragon-ball-dublado/01.MP4" }}
+                source={{ uri: "https://drive.google.com/uc?export=download&id=1_5zeFFHaeUdKYzfrQQK980_HUQj_sLFF" }}
                 rate={1.0}
                 volume={1.0}
                 isMuted={false}
@@ -209,5 +219,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     marginTop: 5,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { FontAwesome } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
+  const [isLoadingVideo, setIsLoadingVideo] = useState(true);
   const soundRef = useRef(null);
   const progressBarRef = useRef(null);
 
@@ -21,6 +22,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
 
   const handleVideoError = (error) => {
     console.error("Erro ao carregar ou reproduzir o vídeo:", error);
+    // Você pode adicionar aqui lógica para exibir uma mensagem de erro ao usuário
   };
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
 
   useEffect(() => {
     const loadAudio = async () => {
-      if (audioUri && audioUri.includes('.m4a')) {
+      if (audioUri && audioUri.includes('.ogg')) {
         try {
           const { sound, status } = await Audio.Sound.createAsync(
             { uri: audioUri },
@@ -39,7 +41,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           soundRef.current = sound;
           setDuration(status.durationMillis);
         } catch (error) {
-          console.log("Error loading audio:", error);
+          console.error("Error loading audio:", error);
         }
       }
     };
@@ -60,6 +62,9 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       if (!status.isPlaying && status.didJustFinish) {
         soundRef.current.setPositionAsync(0);
         setIsPlaying(false);
+      }
+      if (status.durationMillis) {
+        setIsLoadingVideo(false);
       }
     }
   };
@@ -148,8 +153,8 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
     }
     else if (message.imageName && message.imageName.includes(".jpg")) {
       return (
-        <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row justify-end mb-3 mr-3">
-          <View style={{ width: wp(80) }}>
+        <View className="flex-row justify-end mb-3 mr-3">
+          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
             <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
               <Image
                 source={{ uri: imageUri }}
@@ -161,16 +166,21 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                 {message.message}
               </Text>
             </View>
-          </View>
-        </TouchableOpacity >
+          </TouchableOpacity >
+        </View>
       );
     } else if (message.imageName && message.imageName.includes(".mp4")) {
       return (
-        <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row justify-end mb-3 mr-3">
-          <View style={{ width: wp(80) }}>
+        <View className="flex-row justify-end mb-3 mr-3">
+          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
             <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
+              {isLoadingVideo && ( // Renderiza a tela de loading apenas quando o vídeo está sendo carregado
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color="#FFFFFF" />
+                </View>
+              )}
               <Video
-                source={{ uri: "https://sv2.arquivots.fans/Animes/D/dragon-ball-dublado/01.MP4" }}
+                source={{ uri: "https://drive.google.com/uc?export=download&id=1_5zeFFHaeUdKYzfrQQK980_HUQj_sLFF" }}
                 rate={1.0}
                 volume={1.0}
                 isMuted={true}
@@ -184,8 +194,8 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                 {message.message}
               </Text>
             </View>
-          </View>
-        </TouchableOpacity >
+          </TouchableOpacity >
+        </View>
       );
     }
     else {
@@ -225,8 +235,8 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       );
     } else if (message.imageName && message.imageName.includes(".jpg")) {
       return (
-        <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row mb-3 ml-3">
-          <View style={{ width: wp(80) }}>
+        <View className="flex-row mb-3 ml-3">
+          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
             <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
               <Image
                 source={{ uri: imageUri }}
@@ -238,16 +248,16 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                 {message.message}
               </Text>
             </View>
-          </View>
-        </TouchableOpacity >
+          </TouchableOpacity >
+        </View>
       );
     } else if (message.imageName && message.imageName.includes(".mp4")) {
       return (
-        <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} className="flex-row mb-3 ml-3">
-          <View style={{ width: wp(80) }}>
+        <View className="flex-row mb-3 ml-3" >
+          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
             <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
               <Video
-                source={{ uri: "https://sv2.arquivots.fans/Animes/D/dragon-ball-dublado/01.MP4" }}
+                source={{ uri: "https://drive.google.com/uc?export=download&id=1_5zeFFHaeUdKYzfrQQK980_HUQj_sLFF" }}
                 rate={1.0}
                 volume={1.0}
                 isMuted={true}
@@ -261,13 +271,13 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                 {message.message}
               </Text>
             </View>
-          </View>
-        </TouchableOpacity >
+          </TouchableOpacity >
+        </View>
       );
     } else {
       return (
         <View style={{ width: wp(80) }} className="ml-3 mb-3">
-          <View className="flex self-start p-3 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+          <View className="flex self-start p-3 rounded-2xl bg-purple-800 border border-purple-900">
             <Text style={{ fontSize: hp(1.9) }} className="text-white">
               {message.message}
             </Text>
@@ -336,5 +346,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
     borderRadius: 5,
     overflow: 'hidden',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    paddingRight: wp('10%'),
   },
 });
