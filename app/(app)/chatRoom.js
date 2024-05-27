@@ -152,7 +152,7 @@ export default function ChatRoom() {
           id: response.data.message.id,
           conversationId: response.data.message.conversationId.id,
           conversationCreatedAt: response.data.message.conversationId.createdAt,
-          recipientId: response.data.message.recipientId.id,
+          recipientId: response.data.message.recipientId ? response.data.message.recipientId.id : null,
           imageName: response.data.message.imageName,
           createdAt: response.data.message.createdAt,
           senderId: response.data.message.senderId.id,
