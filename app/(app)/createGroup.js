@@ -32,6 +32,16 @@ export default function CreateGroup() {
    const handleCreateGroup = async () => {
       try {
 
+         if (!title || !description) {
+            Dialog.show({
+               type: ALERT_TYPE.DANGER,
+               title: 'Erro!',
+               textBody: "Preencha todos os campos.",
+               button: 'Ok',
+            });
+            return;
+         }
+
          setLoading(true);
          const selectedUsers = JSON.parse(params.selectedUsers);
          const formData = new FormData();
