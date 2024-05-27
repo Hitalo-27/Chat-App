@@ -42,7 +42,7 @@ export default function ChatList({ users, isConversation = true, isGroup = false
     <View className="flex-1">
       <FlatList
         data={users}
-        contentContainerStyle={{ flex: 1, paddingVertical: 25, backgroundColor: '#121212' }}
+        contentContainerStyle={{ paddingVertical: 25, backgroundColor: '#121212' }}
         keyExtractor={item => Math.random()}
         showsVerticalScrollIndicator={true}
         renderItem={({ item, index }) =>
