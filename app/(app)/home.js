@@ -7,7 +7,6 @@ import { useRouter } from "expo-router";
 import { useAuth } from '../../context/authContext';
 import io from 'socket.io-client';
 
-// Inicialize o socket fora do componente para garantir que ele seja inicializado apenas uma vez
 const socket = io('https://server-chat-app-nfhd.onrender.com');
 
 export default function Home() {

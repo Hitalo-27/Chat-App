@@ -118,6 +118,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const getMessages = async (user, params) => {
     try {
+      setMessages([]);
       let response = [];
       if (!params.idConversation) {
         response = await axios.get(

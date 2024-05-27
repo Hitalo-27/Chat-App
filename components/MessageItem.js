@@ -195,7 +195,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                   onError={handleVideoError}
                 />
                 <View style={{ position: 'absolute', top: '45%', left: '50%', transform: [{ translateX: -12 }, { translateY: -12 }] }} >
-                  <FontAwesome name="play" size={50} color="#FFF"/>
+                  <FontAwesome name="play" size={50} color="#FFF" />
                 </View>
                 {message.message && (
                   <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
@@ -228,7 +228,11 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
         return (
           <View style={styles.messageRowLeft}>
             <View style={styles.messageBoxLeft}>
+              {message.senderName && (
+                <Text style={{ fontSize: hp(1.2) }} className="text-blue-500 pb-2"> ~{message.senderName} </Text>
+              )}
               <View style={styles.audioContainer}>
+
                 {isLoadingMedia ? (
                   <View style={styles.playButton}>
                     <ActivityIndicator size="large" color="#FFFFFF" />
@@ -256,6 +260,9 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           <View className="flex-row mb-3 ml-3">
             <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(70) }}>
               <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+                {message.senderName && (
+                  <Text style={{ fontSize: hp(1.2) }} className="text-blue-500 pb-2"> ~{message.senderName} </Text>
+                )}
                 <Image
                   source={{ uri: imageUri }}
                   style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
@@ -276,6 +283,9 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           <View className="flex-row mb-3 ml-3" >
             <TouchableOpacity onPress={() => toggleFullScreen(mediaUri, message.message, 'mp4')} style={{ width: wp(70) }}>
               <View className="relative self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+                {message.senderName && (
+                  <Text style={{ fontSize: hp(1.2) }} className="text-blue-500 pb-2"> ~{message.senderName} </Text>
+                )}
                 {isLoadingMedia && (
                   <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#FFFFFF" />
@@ -293,13 +303,11 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                   onError={handleVideoError}
                 />
                 <View style={{ position: 'absolute', top: '45%', left: '50%', transform: [{ translateX: -12 }, { translateY: -12 }] }} >
-                  <FontAwesome name="play" size={50} color="#FFF"/>
+                  <FontAwesome name="play" size={50} color="#FFF" />
                 </View>
-                {message.message && (
-                  <Text style={{ fontSize: hp(1.9) }} className="text-white">
-                    {message.message}
-                  </Text>
-                )}
+                <Text style={{ fontSize: hp(1.9) }} className="text-white">
+                  {message.message}
+                </Text>
               </View>
             </TouchableOpacity >
           </View>
@@ -309,6 +317,9 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       return (
         <View style={{ width: wp(70) }} className="ml-3 mb-3">
           <View className="flex self-start p-3 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+            {message.senderName && (
+              <Text style={{ fontSize: hp(1.2) }} className="text-blue-500"> ~{message.senderName} </Text>
+            )}
             <Text style={{ fontSize: hp(1.9) }} className="text-white">
               {message.message}
             </Text>
