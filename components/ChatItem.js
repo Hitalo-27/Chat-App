@@ -8,9 +8,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 export default function ChatItem({ item, router, noBorder, isConversation, isGroup, isSelected, onSelect}) {
   const { user } = useAuth();
 
-  const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${item ? item.recipientImageName : ''}`);
+  const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${item ? item.recipientImageName ? JSON.parse(item.recipientImageName).id : item.imageName ? JSON.parse(item.imageName).id : '' : ''}`);
   const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-
+  
   const handleImageError = () => {
     setImageUri(fallbackImageUri);
   };

@@ -6,7 +6,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Audio, Video } from 'expo-av';
 
 export default function MessageItem({ message, currentUser, toggleFullScreen }) {
-  const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${message.imageName}`);
+  const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${message.imageName ? JSON.parse(message.imageName).id : ''}`);
+  const [videoUri, setVideoUri] = useState(`https://drive.google.com/uc?export=download&id=${message.imageName ? JSON.parse(message.imageName).id : ''}`);
   const fallbackImageUri = 'https://media.istockphoto.com/id/1396814518/vector/image-coming-soon-no-photo-no-thumbnail-image-available-vector-illustration.jpg?s=612x612&w=0&k=20&c=hnh2OZgQGhf0b46-J2z7aHbIWwq8HNlSDaNp2wn_iko=';
   const [audioUri, setAudioUri] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -129,74 +130,76 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
 
 
   if (currentUser?.userId === message?.senderId) {
-    if (message.imageName && message.imageName.includes(".m4a")) {
-      return (
-        <View style={styles.messageRowRight}>
-          <View style={styles.messageBoxRight}>
-            <View style={styles.audioContainer}>
-              <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
-                <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
-              </TouchableOpacity>
-              <View
-                style={styles.progressBarContainer}
-                ref={progressBarRef}
-                onStartShouldSetResponder={() => true}
-                onResponderRelease={handleProgressBarPress}
-              >
-                <View style={[styles.progressBar, { width: `${progress}%` }]}></View>
+    if (message.imageName) {
+      let arquivo = JSON.parse(message.imageName);
+      if (arquivo.extensao === "ogg") {
+        return (
+          <View style={styles.messageRowRight}>
+            <View style={styles.messageBoxRight}>
+              <View style={styles.audioContainer}>
+                <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
+                  <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
+                </TouchableOpacity>
+                <View
+                  style={styles.progressBarContainer}
+                  ref={progressBarRef}
+                  onStartShouldSetResponder={() => true}
+                  onResponderRelease={handleProgressBarPress}
+                >
+                  <View style={[styles.progressBar, { width: `${progress}%` }]}></View>
+                </View>
+                <Text style={styles.timeText}>{formatTime(position)} / {formatTime(duration)}</Text>
               </View>
-              <Text style={styles.timeText}>{formatTime(position)} / {formatTime(duration)}</Text>
             </View>
           </View>
-        </View>
-      );
-    }
-    else if (message.imageName && message.imageName.includes(".jpg")) {
-      return (
-        <View className="flex-row justify-end mb-3 mr-3">
-          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
-            <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
-              <Image
-                source={{ uri: imageUri }}
-                style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
-                className="rounded-lg"
-                onError={handleImageError}
-              />
-              <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
-                {message.message}
-              </Text>
-            </View>
-          </TouchableOpacity >
-        </View>
-      );
-    } else if (message.imageName && message.imageName.includes(".mp4")) {
-      return (
-        <View className="flex-row justify-end mb-3 mr-3">
-          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
-            <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
-              {isLoadingVideo && ( // Renderiza a tela de loading apenas quando o vídeo está sendo carregado
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="large" color="#FFFFFF" />
-                </View>
-              )}
-              <Video
-                source={{ uri: "https://drive.google.com/uc?export=download&id=1_5zeFFHaeUdKYzfrQQK980_HUQj_sLFF" }}
-                rate={1.0}
-                volume={1.0}
-                isMuted={true}
-                resizeMode="cover"
-                shouldPlay
-                isLooping
-                style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
-                onError={handleVideoError}
-              />
-              <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
-                {message.message}
-              </Text>
-            </View>
-          </TouchableOpacity >
-        </View>
-      );
+        );
+      } else if (arquivo.extensao === "jpg") {
+        return (
+          <View className="flex-row justify-end mb-3 mr-3">
+            <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(80) }}>
+              <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
+                <Image
+                  source={{ uri: imageUri }}
+                  style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
+                  className="rounded-lg"
+                  onError={handleImageError}
+                />
+                <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
+                  {message.message}
+                </Text>
+              </View>
+            </TouchableOpacity >
+          </View>
+        );
+      } else if (arquivo.extensao === "mp4") {
+        return (
+          <View className="flex-row justify-end mb-3 mr-3">
+            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message,'mp4')} style={{ width: wp(80) }}>
+              <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
+                {isLoadingVideo && ( // Renderiza a tela de loading apenas quando o vídeo está sendo carregado
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  </View>
+                )}
+                <Video
+                  source={{ uri: videoUri }}
+                  rate={1.0}
+                  volume={1.0}
+                  isMuted={true}
+                  resizeMode="cover"
+                  shouldPlay
+                  isLooping
+                  style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
+                  onError={handleVideoError}
+                />
+                <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
+                  {message.message}
+                </Text>
+              </View>
+            </TouchableOpacity >
+          </View>
+        );
+      }
     }
     else {
       return (
@@ -212,68 +215,71 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       );
     }
   } else {
-    if (message.imageName && message.imageName.includes(".m4a")) {
-      return (
-        <View style={styles.messageRowLeft}>
-          <View style={styles.messageBoxLeft}>
-            <View style={styles.audioContainer}>
-              <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
-                <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
-              </TouchableOpacity>
-              <View
-                style={styles.progressBarContainerLeft}
-                ref={progressBarRef}
-                onStartShouldSetResponder={() => true}
-                onResponderRelease={handleProgressBarPress}
-              >
-                <View style={[styles.progressBar, { width: `${progress}%` }]}></View>
+    if (message.imageName) {
+      let arquivo = JSON.parse(message.imageName);
+      if (arquivo.extensao === "ogg") {
+        return (
+          <View style={styles.messageRowLeft}>
+            <View style={styles.messageBoxLeft}>
+              <View style={styles.audioContainer}>
+                <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
+                  <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
+                </TouchableOpacity>
+                <View
+                  style={styles.progressBarContainerLeft}
+                  ref={progressBarRef}
+                  onStartShouldSetResponder={() => true}
+                  onResponderRelease={handleProgressBarPress}
+                >
+                  <View style={[styles.progressBar, { width: `${progress}%` }]}></View>
+                </View>
+                <Text style={styles.timeText}>{formatTime(position)} / {formatTime(duration)}</Text>
               </View>
-              <Text style={styles.timeText}>{formatTime(position)} / {formatTime(duration)}</Text>
             </View>
           </View>
-        </View>
-      );
-    } else if (message.imageName && message.imageName.includes(".jpg")) {
-      return (
-        <View className="flex-row mb-3 ml-3">
-          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
-            <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
-              <Image
-                source={{ uri: imageUri }}
-                style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
-                className="rounded-lg"
-                onError={handleImageError}
-              />
-              <Text style={{ fontSize: hp(1.9) }} className="text-white">
-                {message.message}
-              </Text>
-            </View>
-          </TouchableOpacity >
-        </View>
-      );
-    } else if (message.imageName && message.imageName.includes(".mp4")) {
-      return (
-        <View className="flex-row mb-3 ml-3" >
-          <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message)} style={{ width: wp(80) }}>
-            <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
-              <Video
-                source={{ uri: "https://drive.google.com/uc?export=download&id=1_5zeFFHaeUdKYzfrQQK980_HUQj_sLFF" }}
-                rate={1.0}
-                volume={1.0}
-                isMuted={true}
-                resizeMode="cover"
-                shouldPlay
-                isLooping
-                style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
-                onError={handleVideoError}
-              />
-              <Text style={{ fontSize: hp(1.9) }} className="text-white">
-                {message.message}
-              </Text>
-            </View>
-          </TouchableOpacity >
-        </View>
-      );
+        );
+      } else if (arquivo.extensao === "jpg") {
+        return (
+          <View className="flex-row mb-3 ml-3">
+            <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(80) }}>
+              <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+                <Image
+                  source={{ uri: imageUri }}
+                  style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
+                  className="rounded-lg"
+                  onError={handleImageError}
+                />
+                <Text style={{ fontSize: hp(1.9) }} className="text-white">
+                  {message.message}
+                </Text>
+              </View>
+            </TouchableOpacity >
+          </View>
+        );
+      } else if (arquivo.extensao === "mp4") {
+        return (
+          <View className="flex-row mb-3 ml-3" >
+            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message, 'mp4')} style={{ width: wp(80) }}>
+              <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+                <Video
+                  source={{ uri: videoUri }}
+                  rate={1.0}
+                  volume={1.0}
+                  isMuted={true}
+                  resizeMode="cover"
+                  shouldPlay
+                  isLooping
+                  style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
+                  onError={handleVideoError}
+                />
+                <Text style={{ fontSize: hp(1.9) }} className="text-white">
+                  {message.message}
+                </Text>
+              </View>
+            </TouchableOpacity >
+          </View>
+        );
+      }
     } else {
       return (
         <View style={{ width: wp(80) }} className="ml-3 mb-3">

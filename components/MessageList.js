@@ -8,7 +8,8 @@ import Slider from '@react-native-community/slider';
 
 export default function MessageList({ scrollViewRef, messages, currentUser }) {
   const [showFullScreen, setShowFullScreen] = useState(false);
-  const [imageModal, setImageModal] = useState('');
+  const [arquivoModal, setarquivoModal] = useState('');
+  const [extensao, setExtensao] = useState('');
   const [messageModal, setMessageModal] = useState('');
   const [isPlaying, setIsPlaying] = useState(true);
   const [sliderValue, setSliderValue] = useState(0);
@@ -18,11 +19,12 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
   const [isSliding, setIsSliding] = useState(false);
   const [showControls, setShowControls] = useState(false);
 
-  function toggleFullScreen(imageModal, messageModal) {
+  function toggleFullScreen(arquivoModal, messageModal, extensao) {
     setShowFullScreen(!showFullScreen);
-    setImageModal(imageModal);
+    setarquivoModal(arquivoModal);
     setMessageModal(messageModal);
     setIsLoadingVideo(true); // Ativa o loading quando a modal é aberta
+    setExtensao(extensao);
   }
 
   const onClose = () => {
@@ -102,20 +104,20 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
             </View>
           )}
 
-          {imageModal.includes('.jpg') || imageModal.includes('.png') ? (
+          {extensao === 'jpg' ? (
             <ImageZoom
               cropWidth={Dimensions.get('window').width}
               cropHeight={Dimensions.get('window').height}
               imageWidth={Dimensions.get('window').width}
               imageHeight={Dimensions.get('window').height}
             >
-              <Image source={{ uri: imageModal }} style={styles.image} resizeMode="contain" />
+              <Image source={{ uri: arquivoModal }} style={styles.image} resizeMode="contain" />
             </ImageZoom>
           ) : (
             <TouchableOpacity style={styles.videoWrapper} onPress={toggleControls}>
               <Video
                 ref={videoRef}
-                source={{ uri: "https://drive.google.com/uc?export=download&id=1_5zeFFHaeUdKYzfrQQK980_HUQj_sLFF" }}
+                source={{ uri: arquivoModal }}
                 rate={1.0}
                 volume={1.0}
                 isMuted={false}

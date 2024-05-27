@@ -22,7 +22,7 @@ export default function Profile() {
    const [loading, setLoading] = useState(false);
    const router = useRouter();
 
-   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${user ? user.imageName : ''}`);
+   const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${user.imageName ? JSON.parse(user.imageName).id : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
    const handleImageError = () => {
@@ -107,7 +107,7 @@ export default function Profile() {
 
    useEffect(() => {
       setName(user.name);
-      setImageUri(`http://192.168.15.11:8080/${user.imageName}`);
+      setImageUri(`https://drive.google.com/uc?id=${user.imageName ? JSON.parse(user.imageName).id : ''}`);
    }, [user]);
 
    return (

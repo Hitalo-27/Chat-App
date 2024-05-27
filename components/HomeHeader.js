@@ -19,7 +19,7 @@ export default function HomeHeader({title}) {
    const { top } = useSafeAreaInsets();
    const { logout, user } = useAuth();
    const router = useRouter();
-   const [imageUri, setImageUri] = useState(`http://192.168.15.11:8080/${user ? user.imageName : ''}`);
+   const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${user ? user.imageName ? JSON.parse(user.imageName).id : '' : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
    const handleImageError = () => {
