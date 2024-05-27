@@ -4,8 +4,9 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../context/authContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import { blurhash } from "../utils/common";
 
-export default function ChatItem({ item, router, noBorder, isConversation, isGroup, isSelected, onSelect}) {
+export default function ChatItem({ item, router, noBorder, isConversation, isGroup, isSelected, onSelect }) {
   const { user } = useAuth();
 
   var id = item.id;
@@ -26,7 +27,7 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
     }
   }
 
-  if(!imageName){
+  if (!imageName) {
     imageName = item.imageName
   }
 
@@ -66,6 +67,8 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
         source={{ uri: imageUri }}
         style={{ height: hp(6), width: hp(6), borderRadius: 100 }}
         onError={handleImageError}
+        placeholder={blurhash}
+        transition={500}
       />
 
       <View className="flex-1 gap-1">
@@ -77,7 +80,7 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
             </View>
           ) : null}
         </View>
-        <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email ? item.email : item.chatId!=0 ? (<MaterialIcons name="perm-media" size={20} color="#d4d4d4" /> ) : "Sem Conversa"}</Text>
+        <Text style={{ fontSize: hp(1.6) }} className="font-medium text-neutral-300">{item.lastMessage ? item.lastMessage : item.email ? item.email : item.chatId != 0 ? (<MaterialIcons name="perm-media" size={20} color="#d4d4d4" />) : "Sem Conversa"}</Text>
       </View>
 
     </TouchableOpacity>

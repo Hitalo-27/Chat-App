@@ -5,6 +5,7 @@ import { Entypo, Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Stack } from 'expo-router';
 import { useAuth } from '../context/authContext';
+import { blurhash } from "../utils/common";
 
 export default function ChatRoomHeader({ router, user }) {
   user = user.user;
@@ -42,6 +43,8 @@ export default function ChatRoomHeader({ router, user }) {
                 source={{ uri: imageUri }}
                 style={{ height: hp(4, 5), aspectRatio: 1, borderRadius: 100 }}
                 onError={handleImageError}
+                placeholder={blurhash}
+                transition={500}
               />
               <Text style={{ fontSize: hp(2.5) }} className="font-medium text-neutral-100">
                 {user?.name || 'Usuário'}

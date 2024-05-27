@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StatusBar, FlatList, ActivityI
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../../context/authContext';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { AntDesign, Entypo, Feather } from '@expo/vector-icons';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import MembersList from '../../components/MembersList';
@@ -64,13 +64,48 @@ export default function ChatProfile() {
       }
    };
 
+   const addUsersGroup = async () => {
+      try {
+         const response = await axios.get(
+            `https://aps-redes-service.onrender.com/group/get/not-members/${conversation.idConversation}`,
+            {
+               headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer Authorization ${user.token}`
+               },
+            }
+         );
+
+
+         if (response.data.message.length > 0) {
+            router.push(
+               {
+                  pathname: 'addUsersGroup',
+                  params: {
+                     usersNotGroup: JSON.stringify(response.data.message),
+                     idConversationAdd: conversation.idConversation
+                  }
+               });
+         } else {
+            Dialog.show({
+               type: ALERT_TYPE.DANGER,
+               title: 'Atenção!',
+               textBody: "Todos os usuários cadastrados já estão no grupo!",
+               button: 'Ok',
+            });
+         }
+
+      } catch (error) {
+         console.log(error);
+      }
+   };
+
    const updateGroup = async () => {
       try {
          setLoading(true);
          const formData = new FormData();
          formData.append('title', title);
          formData.append('description', description);
-         console.log(imageCompleted);
          if (imageCompleted) {
             uri = imageCompleted.uri;
 
@@ -160,6 +195,9 @@ export default function ChatProfile() {
          <View style={{ alignItems: 'center' }}>
             {conversation.groupConversation === 'true' ? (
                <>
+                  <TouchableOpacity onPress={addUsersGroup} style={{ backgroundColor: '#581c87', position: 'absolute', left: 20, padding: 10, borderRadius: 10, marginTop: hp(5) }}>
+                     <AntDesign name="pluscircleo" size={24} color="white" />
+                  </TouchableOpacity>
                   {loading ? (
                      <View style={{ backgroundColor: '#581c87', position: 'absolute', right: 20, padding: 10, borderRadius: 10, marginTop: hp(5) }}>
                         <ActivityIndicator size="large" color="#FFFFFF" />

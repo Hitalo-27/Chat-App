@@ -4,6 +4,7 @@ import { StatusBar } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import ChatList from '../../components/ChatList';
 import axios from 'axios';
+import Loading from '../../components/Loading';
 import { useAuth } from '../../context/authContext';
 
 export default function Contacts() {
@@ -44,7 +45,7 @@ export default function Contacts() {
             <ChatList users={users} isConversation={false} />
          ) : (
             <View style={{ flex: 1, paddingTop: hp('40%'), alignItems: 'center' }}>
-               <Text style={{ fontSize: 25 }} className="text-purple-800 font-bold">Nenhum contato encontrado!</Text>
+               <Loading size={hp(6.5)} />
             </View>
          )}
       </View>
