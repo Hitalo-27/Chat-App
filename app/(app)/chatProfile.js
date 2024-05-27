@@ -274,22 +274,21 @@ export default function ChatProfile() {
          </View>
 
          {conversation.groupConversation === 'true' && (
-            <View className="mx-4">
-               <FlatList
-                  data={users}
-                  keyExtractor={(item, index) => index.toString()}
-                  showsVerticalScrollIndicator={true}
-                  renderItem={({ item, index }) =>
-                     <MembersList
-                        noBorder={index + 1 === users.length}
-                        router={router}
-                        item={item}
-                        index={index}
-                        conversationId={conversation.idConversation}
-                     />
-                  }
-               />
-            </View>
+            <FlatList
+               data={users}
+               keyExtractor={(item, index) => index.toString()}
+               showsVerticalScrollIndicator={true}
+               style={{ marginHorizontal: 10, marginBottom: 10 }}
+               renderItem={({ item, index }) =>
+                  <MembersList
+                     noBorder={index + 1 === users.length}
+                     router={router}
+                     item={item}
+                     index={index}
+                     conversationId={conversation.idConversation}
+                  />
+               }
+            />
          )}
 
          <AlertNotificationRoot colors={[{

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, TouchableOpacity, View, Text } from 'react-native';
+import { FlatList, TouchableOpacity, View, Text, ActivityIndicator } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useRouter } from 'expo-router';
 import ChatItem from './ChatItem';
@@ -11,6 +11,7 @@ import axios from 'axios';
 export default function ChatList({ users, isConversation = true, isGroup = false, idConversationAdd = null }) {
   const router = useRouter();
   const { selectedUsers, setSelectedUsers, user } = useAuth();
+  const [loadingAddUsers, setLoadingAddUsers] = useState(false);
 
   const handleSelectUser = (user) => {
     if (selectedUsers.includes(user)) {
@@ -51,6 +52,7 @@ export default function ChatList({ users, isConversation = true, isGroup = false
         return;
       }
 
+      setLoadingAddUsers(true);
       await Promise.all(selectedUsers.map(async (selectedUser) => {
         const responseAddUser = await axios.post(
           `https://aps-redes-service.onrender.com/group/add/${idConversationAdd}`,
@@ -81,6 +83,8 @@ export default function ChatList({ users, isConversation = true, isGroup = false
         textBody: error.response.data.message,
         button: 'Ok',
       });
+    } finally {
+      setLoadingAddUsers(false);
     }
   };
 
@@ -117,7 +121,11 @@ export default function ChatList({ users, isConversation = true, isGroup = false
         isGroup === true ? (
           <>
             <TouchableOpacity onPress={idConversationAdd ? handleAddUsersGroup : handleCreateGroup} className="absolute right-0 bottom-0 mr-4 mb-4 bg-purple-900" style={{ width: wp(15), height: wp(15), borderRadius: wp(15) / 2, justifyContent: 'center', alignItems: 'center' }}>
-              <Entypo name="chevron-right" size={24} color="white" />
+              {loadingAddUsers ? (
+                <ActivityIndicator size={24} color="white" />
+              ) : (
+                <Entypo name="chevron-right" size={24} color="white" />
+              )}
             </TouchableOpacity>
             <View>
               <AlertNotificationRoot colors={[{
