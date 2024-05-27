@@ -15,7 +15,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
-const socket = io('http://192.168.15.11:3000');
+const socket = io('https://server-chat-app-nfhd.onrender.com');
 
 export default function ChatRoom() {
   const router = useRouter();

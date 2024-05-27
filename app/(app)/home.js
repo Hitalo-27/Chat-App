@@ -8,7 +8,7 @@ import { useAuth } from '../../context/authContext';
 import io from 'socket.io-client';
 
 // Inicialize o socket fora do componente para garantir que ele seja inicializado apenas uma vez
-const socket = io('http://192.168.15.11:3000');
+const socket = io('https://server-chat-app-nfhd.onrender.com');
 
 export default function Home() {
    const [conversation, setConversation] = useState([]);

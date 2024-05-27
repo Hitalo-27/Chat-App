@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "chat-app",
-    "slug": "chat-app",
+    "name": "river-chat",
+    "slug": "river-chat",
     "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon2.png",
@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/images/adaptive-icon2.png",
         "backgroundColor": "#121212"
       },
-      "package": "chat.app",
+      "package": "river.chat",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
