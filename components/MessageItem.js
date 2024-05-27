@@ -156,7 +156,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       } else if (arquivo.extensao === "jpg") {
         return (
           <View className="flex-row justify-end mb-3 mr-3">
-            <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(80) }}>
+            <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(70) }}>
               <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
                 <Image
                   source={{ uri: imageUri }}
@@ -164,9 +164,11 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                   className="rounded-lg"
                   onError={handleImageError}
                 />
-                <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
-                  {message.message}
-                </Text>
+                {message.message && (
+                  <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
+                    {message.message}
+                  </Text>
+                )}
               </View>
             </TouchableOpacity >
           </View>
@@ -174,9 +176,9 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       } else if (arquivo.extensao === "mp4") {
         return (
           <View className="flex-row justify-end mb-3 mr-3">
-            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message,'mp4')} style={{ width: wp(80) }}>
+            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message, 'mp4')} style={{ width: wp(70) }}>
               <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
-                {isLoadingVideo && ( // Renderiza a tela de loading apenas quando o vídeo está sendo carregado
+                {isLoadingVideo && (
                   <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#FFFFFF" />
                   </View>
@@ -192,9 +194,11 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                   style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
                   onError={handleVideoError}
                 />
-                <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
-                  {message.message}
-                </Text>
+                {message.message && (
+                  <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
+                    {message.message}
+                  </Text>
+                )}
               </View>
             </TouchableOpacity >
           </View>
@@ -204,7 +208,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
     else {
       return (
         <View className="flex-row justify-end mb-3 mr-3">
-          <View style={{ width: wp(80) }}>
+          <View style={{ width: wp(70) }}>
             <View className="flex self-end p-3 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
               <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100">
                 {message.message}
@@ -241,7 +245,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       } else if (arquivo.extensao === "jpg") {
         return (
           <View className="flex-row mb-3 ml-3">
-            <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(80) }}>
+            <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(70) }}>
               <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
                 <Image
                   source={{ uri: imageUri }}
@@ -249,9 +253,11 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                   className="rounded-lg"
                   onError={handleImageError}
                 />
-                <Text style={{ fontSize: hp(1.9) }} className="text-white">
-                  {message.message}
-                </Text>
+                {message.message && (
+                  <Text style={{ fontSize: hp(1.9) }} className="text-white">
+                    {message.message}
+                  </Text>
+                )}
               </View>
             </TouchableOpacity >
           </View>
@@ -259,8 +265,13 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       } else if (arquivo.extensao === "mp4") {
         return (
           <View className="flex-row mb-3 ml-3" >
-            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message, 'mp4')} style={{ width: wp(80) }}>
+            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message, 'mp4')} style={{ width: wp(70) }}>
               <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+                {isLoadingVideo && (
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  </View>
+                )}
                 <Video
                   source={{ uri: videoUri }}
                   rate={1.0}
@@ -272,9 +283,11 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                   style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
                   onError={handleVideoError}
                 />
-                <Text style={{ fontSize: hp(1.9) }} className="text-white">
-                  {message.message}
-                </Text>
+                {message.message && (
+                  <Text style={{ fontSize: hp(1.9) }} className="text-white">
+                    {message.message}
+                  </Text>
+                )}
               </View>
             </TouchableOpacity >
           </View>
@@ -282,8 +295,8 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       }
     } else {
       return (
-        <View style={{ width: wp(80) }} className="ml-3 mb-3">
-          <View className="flex self-start p-3 rounded-2xl bg-purple-800 border border-purple-900">
+        <View style={{ width: wp(70) }} className="ml-3 mb-3">
+          <View className="flex self-start p-3 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
             <Text style={{ fontSize: hp(1.9) }} className="text-white">
               {message.message}
             </Text>
@@ -359,6 +372,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     height: '100%',
-    paddingRight: wp('10%'),
+    paddingRight: wp('3%'),
   },
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Keyboard, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Keyboard, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import ChatRoomHeader from '../../components/ChatRoomHeader';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import MessageList from '../../components/MessageList';
@@ -28,6 +28,7 @@ export default function ChatRoom() {
   const scrollViewRef = useRef(null);
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchMessages();
@@ -81,6 +82,7 @@ export default function ChatRoom() {
   async function sendMessage(audioTeste = null) {
     if (messageAtual || mediaCompleted || audioTeste) {
       try {
+        setLoading(true);
         let uri = null;
         let type = null;
         let name = null;
@@ -158,8 +160,11 @@ export default function ChatRoom() {
 
         // Atualize a lista de mensagens
         setMessages([...messages, novaMessage]);
+
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     }
   }
@@ -250,28 +255,37 @@ export default function ChatRoom() {
                 style={{ fontSize: hp(2), backgroundColor: "transparent", color: "#e3e3e3" }}
                 className="flex-1 mr-2"
               />
-              {recording ? (
-                <TouchableOpacity onPress={excluseRecording} className="bg-neutral-100 p-2 mr-[4px] rounded-full">
-                  <AntDesign name="delete" size={hp(2.7)} color="red" />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity onPress={pickMedia} className="p-2 mr-[4px] rounded-full">
-                  <Feather name="camera" size={hp(2.7)} color="white" />
-                </TouchableOpacity>
-              )}
-              {messageAtual || mediaCompleted ? (
-                <TouchableOpacity onPress={() => sendMessage(null)} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
-                  <Feather name="send" size={hp(2.7)} color="black" />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity onPress={recording ? stopRecording : startRecording} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
-                  {recording ? (
-                    <Feather name="stop-circle" size={hp(2.7)} color="red" />
-                  ) : (
-                    <Feather name="mic" size={hp(2.7)} color="black" />
-                  )}
-                </TouchableOpacity>
-              )}
+              {
+                loading ? (
+                  <View className="flex-row justify-center">
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  </View>
+                ) : (
+                  <>
+                    {recording ? (
+                      <TouchableOpacity onPress={excluseRecording} className="bg-neutral-100 p-2 mr-[4px] rounded-full">
+                        <AntDesign name="delete" size={hp(2.7)} color="red" />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity onPress={pickMedia} className="p-2 mr-[4px] rounded-full">
+                        <Feather name="camera" size={hp(2.7)} color="white" />
+                      </TouchableOpacity>
+                    )}
+                    {messageAtual || mediaCompleted ? (
+                      <TouchableOpacity onPress={() => sendMessage(null)} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
+                        <Feather name="send" size={hp(2.7)} color="black" />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity onPress={recording ? stopRecording : startRecording} className="bg-neutral-100 p-2 mr-[1px] rounded-full">
+                        {recording ? (
+                          <Feather name="stop-circle" size={hp(2.7)} color="red" />
+                        ) : (
+                          <Feather name="mic" size={hp(2.7)} color="black" />
+                        )}
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
             </View>
           </View>
         </View>

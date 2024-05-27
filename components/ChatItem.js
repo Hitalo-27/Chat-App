@@ -8,16 +8,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 export default function ChatItem({ item, router, noBorder, isConversation, isGroup, isSelected, onSelect}) {
   const { user } = useAuth();
 
-  const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${item ? item.recipientImageName ? JSON.parse(item.recipientImageName).id : item.imageName ? JSON.parse(item.imageName).id : '' : ''}`);
-  const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-  
-  const handleImageError = () => {
-    setImageUri(fallbackImageUri);
-  };
-
   var id = item.id;
   var name = item.name ? item.name : item.groupName;
-  var imageName = item.recipientImageName;
+  var imageName = item.groupImage;
   var groupConversation = item.groupName ? true : false;
 
   if (!id && !name) {
@@ -25,11 +18,24 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
     if (user.id === item.senderId) {
       id = item.userIdByRecipientId;
       name = item.recipientName;
+      imageName = imageName ? imageName : item.recipientImageName;
     } else {
       id = item.senderId;
       name = item.senderName;
+      imageName = imageName ? imageName : item.senderImageName;
     }
   }
+
+  if(!imageName){
+    imageName = item.imageName
+  }
+
+  const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${imageName ? JSON.parse(imageName).id : ''}`);
+  const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+
+  const handleImageError = () => {
+    setImageUri(fallbackImageUri);
+  };
 
   const openChatRoom = () => {
     router.push({

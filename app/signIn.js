@@ -17,25 +17,36 @@ export default function SignIn() {
     const { login } = useAuth();
 
     const handleLogin = async () => {
-        if (!emailRef.current || !passwordRef.current) {
-            Dialog.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Erro!',
-                textBody: "Preencha todos os campos!",
-                button: 'Ok',
-            });
-            return;
+        try{
+            if (!emailRef.current || !passwordRef.current) {
+                Dialog.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Erro!',
+                    textBody: "Preencha todos os campos!",
+                    button: 'Ok',
+                });
+                return;
+            }
+    
+            setLoading(true);
+            const response = await login(emailRef.current, passwordRef.current);
+            setLoading(false);
+    
+            if (response.error === true) {
+                Dialog.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Erro!',
+                    textBody: response.message,
+                    button: 'Ok',
+                });
+            }
         }
-
-        setLoading(true);
-        const response = await login(emailRef.current, passwordRef.current);
-        setLoading(false);
-
-        if (response.error === true) {
+        catch(err){
+            setLoading(false);
             Dialog.show({
                 type: ALERT_TYPE.DANGER,
                 title: 'Erro!',
-                textBody: response.message,
+                textBody: 'Ocorreu um erro ao tentar fazer login!',
                 button: 'Ok',
             });
         }

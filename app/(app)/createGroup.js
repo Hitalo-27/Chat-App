@@ -32,6 +32,7 @@ export default function CreateGroup() {
    const handleCreateGroup = async () => {
       try {
 
+         setLoading(true);
          const selectedUsers = JSON.parse(params.selectedUsers);
          const formData = new FormData();
          formData.append('title', title);
@@ -82,6 +83,8 @@ export default function CreateGroup() {
             );
          }));
 
+         setLoading(false);
+
          router.push({
             pathname: 'chatRoom',
             params: {
@@ -99,6 +102,7 @@ export default function CreateGroup() {
 
       } catch (error) {
          console.log(error);
+         setLoading(false);
 
          Dialog.show({
             type: ALERT_TYPE.DANGER,
@@ -189,7 +193,6 @@ export default function CreateGroup() {
                      />
                   </View>
 
-                  {/* botão de login */}
                   <View>
                      {
                         loading ? (
