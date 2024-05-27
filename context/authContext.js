@@ -31,7 +31,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.11:8080/user/login',
+        'https://aps-redes-service.onrender.com/user/login',
         {
           email: email,
           password: password,
@@ -65,7 +65,7 @@ export const AuthContextProvider = ({ children }) => {
   const register = async (email, name, password) => {
     try {
       const response = await axios.post(
-        'http://192.168.15.11:8080/user/create',
+        'https://aps-redes-service.onrender.com/user/create',
         {
           email: email,
           name: name,
@@ -95,7 +95,7 @@ export const AuthContextProvider = ({ children }) => {
         if (!message.visualize) {
           try {
             await axios.put(
-              `http://192.168.15.11:8080/chat/visualize/${message.id}`,
+              `https://aps-redes-service.onrender.com/chat/visualize/${message.id}`,
               null,
               {
                 headers: {
@@ -121,7 +121,7 @@ export const AuthContextProvider = ({ children }) => {
       let response = [];
       if (!params.idConversation) {
         response = await axios.get(
-          `http://192.168.15.11:8080/chat/messages/user/${params.id}`,
+          `https://aps-redes-service.onrender.com/chat/messages/user/${params.id}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ export const AuthContextProvider = ({ children }) => {
       if (params.idLastMessage) {
         if (parseInt(params.senderIdLastMessage) !== parseInt(user.id)) {
           await axios.put(
-            `http://192.168.15.11:8080/chat/visualize/${params.idLastMessage}`,
+            `https://aps-redes-service.onrender.com/chat/visualize/${params.idLastMessage}`,
             null,
             {
               headers: {
@@ -148,7 +148,7 @@ export const AuthContextProvider = ({ children }) => {
       }
 
       response = await axios.get(
-        `http://192.168.15.11:8080/chat/messages/${params.idConversation}`,
+        `https://aps-redes-service.onrender.com/chat/messages/${params.idConversation}`,
         {
           headers: {
             'Content-Type': 'application/json',

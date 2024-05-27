@@ -7,13 +7,13 @@ import { Audio, Video } from 'expo-av';
 
 export default function MessageItem({ message, currentUser, toggleFullScreen }) {
   const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${message.imageName ? JSON.parse(message.imageName).id : ''}`);
-  const [videoUri, setVideoUri] = useState(`https://drive.google.com/uc?export=download&id=${message.imageName ? JSON.parse(message.imageName).id : ''}`);
+  const [mediaUri, setMediaUri] = useState(`https://drive.google.com/uc?export=download&id=${message.imageName ? JSON.parse(message.imageName).id : ''}`);
+  const [extensao, setExtensao] = useState(message.imageName ? JSON.parse(message.imageName).extensao : '');
   const fallbackImageUri = 'https://media.istockphoto.com/id/1396814518/vector/image-coming-soon-no-photo-no-thumbnail-image-available-vector-illustration.jpg?s=612x612&w=0&k=20&c=hnh2OZgQGhf0b46-J2z7aHbIWwq8HNlSDaNp2wn_iko=';
-  const [audioUri, setAudioUri] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
-  const [isLoadingVideo, setIsLoadingVideo] = useState(true);
+  const [isLoadingMedia, setIsLoadingMedia] = useState(true);
   const soundRef = useRef(null);
   const progressBarRef = useRef(null);
 
@@ -23,19 +23,14 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
 
   const handleVideoError = (error) => {
     console.error("Erro ao carregar ou reproduzir o vídeo:", error);
-    // Você pode adicionar aqui lógica para exibir uma mensagem de erro ao usuário
   };
 
   useEffect(() => {
-    setAudioUri(`http://192.168.15.11:8080/${message.imageName}`);
-  }, [message]);
-
-  useEffect(() => {
     const loadAudio = async () => {
-      if (audioUri && audioUri.includes('.ogg')) {
+      if (setMediaUri && extensao === "m4a") {
         try {
           const { sound, status } = await Audio.Sound.createAsync(
-            { uri: audioUri },
+            { uri: mediaUri },
             { shouldPlay: false },
             onPlaybackStatusUpdate
           );
@@ -54,7 +49,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
         soundRef.current.unloadAsync();
       }
     };
-  }, [audioUri]);
+  }, [mediaUri]);
 
   const onPlaybackStatusUpdate = status => {
     if (status.isLoaded) {
@@ -65,7 +60,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
         setIsPlaying(false);
       }
       if (status.durationMillis) {
-        setIsLoadingVideo(false);
+        setIsLoadingMedia(false);
       }
     }
   };
@@ -132,14 +127,20 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
   if (currentUser?.userId === message?.senderId) {
     if (message.imageName) {
       let arquivo = JSON.parse(message.imageName);
-      if (arquivo.extensao === "ogg") {
+      if (arquivo.extensao === "m4a") {
         return (
           <View style={styles.messageRowRight}>
             <View style={styles.messageBoxRight}>
               <View style={styles.audioContainer}>
-                <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
-                  <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
-                </TouchableOpacity>
+                {isLoadingMedia ? (
+                  <View style={styles.playButton}>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  </View>
+                ) : (
+                  <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
+                    <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
+                  </TouchableOpacity>
+                )}
                 <View
                   style={styles.progressBarContainer}
                   ref={progressBarRef}
@@ -176,31 +177,33 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       } else if (arquivo.extensao === "mp4") {
         return (
           <View className="flex-row justify-end mb-3 mr-3">
-            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message, 'mp4')} style={{ width: wp(70) }}>
-              <View className="flex self-end p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
-                {isLoadingVideo && (
+            <TouchableOpacity onPress={() => toggleFullScreen(mediaUri, message.message, 'mp4')}>
+              <View className="relative p-2 rounded-2xl border border-neutral-800" style={{ backgroundColor: "#1e1e1e" }}>
+                {isLoadingMedia && (
                   <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#FFFFFF" />
                   </View>
                 )}
                 <Video
-                  source={{ uri: videoUri }}
+                  source={{ uri: mediaUri }}
                   rate={1.0}
                   volume={1.0}
                   isMuted={true}
                   resizeMode="cover"
-                  shouldPlay
                   isLooping
                   style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
                   onError={handleVideoError}
                 />
+                <View style={{ position: 'absolute', top: '45%', left: '50%', transform: [{ translateX: -12 }, { translateY: -12 }] }} >
+                  <FontAwesome name="play" size={50} color="#FFF"/>
+                </View>
                 {message.message && (
                   <Text style={{ fontSize: hp(1.9) }} className="text-neutral-100 pt-2">
                     {message.message}
                   </Text>
                 )}
               </View>
-            </TouchableOpacity >
+            </TouchableOpacity>
           </View>
         );
       }
@@ -221,14 +224,20 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
   } else {
     if (message.imageName) {
       let arquivo = JSON.parse(message.imageName);
-      if (arquivo.extensao === "ogg") {
+      if (arquivo.extensao === "m4a") {
         return (
           <View style={styles.messageRowLeft}>
             <View style={styles.messageBoxLeft}>
               <View style={styles.audioContainer}>
-                <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
-                  <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
-                </TouchableOpacity>
+                {isLoadingMedia ? (
+                  <View style={styles.playButton}>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  </View>
+                ) : (
+                  <TouchableOpacity onPress={handlePlayPause} style={styles.playButton}>
+                    <FontAwesome name={isPlaying ? 'pause' : 'play'} size={24} color="#FFF" />
+                  </TouchableOpacity>
+                )}
                 <View
                   style={styles.progressBarContainerLeft}
                   ref={progressBarRef}
@@ -265,15 +274,15 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       } else if (arquivo.extensao === "mp4") {
         return (
           <View className="flex-row mb-3 ml-3" >
-            <TouchableOpacity onPress={() => toggleFullScreen(videoUri, message.message, 'mp4')} style={{ width: wp(70) }}>
-              <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
-                {isLoadingVideo && (
+            <TouchableOpacity onPress={() => toggleFullScreen(mediaUri, message.message, 'mp4')} style={{ width: wp(70) }}>
+              <View className="relative self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
+                {isLoadingMedia && (
                   <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#FFFFFF" />
                   </View>
                 )}
                 <Video
-                  source={{ uri: videoUri }}
+                  source={{ uri: mediaUri }}
                   rate={1.0}
                   volume={1.0}
                   isMuted={true}
@@ -283,6 +292,9 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
                   style={{ width: wp(60), height: hp(20), borderRadius: 10 }}
                   onError={handleVideoError}
                 />
+                <View style={{ position: 'absolute', top: '45%', left: '50%', transform: [{ translateX: -12 }, { translateY: -12 }] }} >
+                  <FontAwesome name="play" size={50} color="#FFF"/>
+                </View>
                 {message.message && (
                   <Text style={{ fontSize: hp(1.9) }} className="text-white">
                     {message.message}

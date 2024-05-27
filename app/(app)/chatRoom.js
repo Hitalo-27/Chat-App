@@ -15,7 +15,6 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
-// Inicialize o socket fora do componente para garantir que ele seja inicializado apenas uma vez
 const socket = io('http://192.168.15.11:3000');
 
 export default function ChatRoom() {
@@ -130,7 +129,7 @@ export default function ChatRoom() {
         }
 
         const response = await axios.post(
-          `http://192.168.15.11:8080/${typeRequest}/create/${idChat}`,
+          `https://aps-redes-service.onrender.com/${typeRequest}/create/${idChat}`,
           formData,
           {
             headers: {

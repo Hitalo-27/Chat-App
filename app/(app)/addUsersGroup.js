@@ -28,7 +28,7 @@ export default function AddUsersGroup() {
    const getUsers = async () => {
       try {
          const response = await axios.get(
-            'http://192.168.15.11:8080/user/all',
+            'https://aps-redes-service.onrender.com/user/all',
             {
                headers: {
                   'Content-Type': 'application/json',

@@ -55,7 +55,7 @@ export default function Profile() {
          }
 
          const response = await axios.put(
-            `http://192.168.15.11:8080/user/update`,
+            `https://aps-redes-service.onrender.com/user/update`,
             formData,
             {
                headers: {

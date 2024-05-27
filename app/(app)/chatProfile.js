@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StatusBar, FlatList, SafeAreaView, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StatusBar, FlatList, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useAuth } from '../../context/authContext';
@@ -23,6 +23,7 @@ export default function ChatProfile() {
    const [image, setImage] = useState(null);
    const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${conversation ? conversation.imageName ? JSON.parse(conversation.imageName).id : '' : ''}`);
    const fallbackImageUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+   const [loading, setLoading] = useState(false);
 
    const handleImageError = () => {
       setImageUri(fallbackImageUri);
@@ -31,7 +32,7 @@ export default function ChatProfile() {
    const handleUsers = async () => {
       try {
          const response = await axios.get(
-            `http://192.168.15.11:8080/group/members/${conversation.idConversation}`,
+            `https://aps-redes-service.onrender.com/group/members/${conversation.idConversation}`,
             {
                headers: {
                   'Authorization': `Bearer Authorization ${user.token}`
@@ -65,9 +66,11 @@ export default function ChatProfile() {
 
    const updateGroup = async () => {
       try {
+         setLoading(true);
          const formData = new FormData();
          formData.append('title', title);
          formData.append('description', description);
+         console.log(imageCompleted);
          if (imageCompleted) {
             uri = imageCompleted.uri;
 
@@ -89,7 +92,7 @@ export default function ChatProfile() {
          }
 
          const response = await axios.put(
-            `http://192.168.15.11:8080/group/update/${conversation.idConversation}`,
+            `https://aps-redes-service.onrender.com/group/update/${conversation.idConversation}`,
             formData,
             {
                headers: {
@@ -98,6 +101,13 @@ export default function ChatProfile() {
                }
             }
          );
+
+         setConversation({
+            ...conversation,
+            name: response.data.message.title,
+            groupDescription: response.data.message.description,
+            imageName: response.data.message.imageName
+         });
 
          Dialog.show({
             type: ALERT_TYPE.SUCCESS,
@@ -118,6 +128,8 @@ export default function ChatProfile() {
          });
 
          return;
+      } finally {
+         setLoading(false);
       }
    }
 
@@ -148,9 +160,15 @@ export default function ChatProfile() {
          <View style={{ alignItems: 'center' }}>
             {conversation.groupConversation === 'true' ? (
                <>
-                  <TouchableOpacity onPress={updateGroup} style={{ backgroundColor: '#581c87', position: 'absolute', right: 20, padding: 10, borderRadius: 10, marginTop: hp(5) }}>
-                     <Text style={{ fontSize: hp(2), color: '#FFFFFF' }}>Salvar</Text>
-                  </TouchableOpacity>
+                  {loading ? (
+                     <View style={{ backgroundColor: '#581c87', position: 'absolute', right: 20, padding: 10, borderRadius: 10, marginTop: hp(5) }}>
+                        <ActivityIndicator size="large" color="#FFFFFF" />
+                     </View>
+                  ) : (
+                     <TouchableOpacity onPress={updateGroup} style={{ backgroundColor: '#581c87', position: 'absolute', right: 20, padding: 10, borderRadius: 10, marginTop: hp(5) }}>
+                        <Text style={{ fontSize: hp(2), color: '#FFFFFF' }}>Salvar</Text>
+                     </TouchableOpacity>
+                  )}
                   <TouchableOpacity onPress={pickImage}>
                      <Image
                         source={image ? { uri: image } : { uri: imageUri }}
@@ -171,14 +189,15 @@ export default function ChatProfile() {
             )}
          </View>
 
-         <View style={{ marginBottom: 10, marginTop: 20 }}>
+         <View style={{ marginBottom: 10, marginTop: 20, gap: 10, alignItems: 'center' }}>
             {conversation.groupConversation === 'true' ? (
                <>
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                      <TextInput
                         value={title}
                         onChangeText={setTitle}
-                        style={{ fontSize: hp(3), fontWeight: 'bold', color: '#FFFFFF' }}
+                        style={{ fontSize: hp(3) }}
+                        className="font-bold text-white text-center border-b border-purple-900"
                         placeholder="Titulo"
                         placeholderTextColor={'gray'}
                      />
@@ -187,7 +206,8 @@ export default function ChatProfile() {
                      <TextInput
                         value={description}
                         onChangeText={setDescription}
-                        style={{ fontSize: hp(2), fontWeight: 'semi-bold', color: '#FFFFFF' }}
+                        style={{ fontSize: hp(2.5) }}
+                        className="font-semibold text-white text-center border-b border-purple-900"
                         placeholder="Descrição"
                         placeholderTextColor={'gray'}
                      />
@@ -201,7 +221,7 @@ export default function ChatProfile() {
                </View>
             )}
             {conversation.groupConversation === 'true' ? (
-               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
                   <Text style={{ fontSize: hp(2), color: '#FFFFFF' }}>
                      Total de Membros: {users.length}
                   </Text>
@@ -216,20 +236,22 @@ export default function ChatProfile() {
          </View>
 
          {conversation.groupConversation === 'true' && (
-            <FlatList
-               data={users}
-               keyExtractor={(item, index) => index.toString()}
-               showsVerticalScrollIndicator={true}
-               renderItem={({ item, index }) =>
-                  <MembersList
-                     noBorder={index + 1 === users.length}
-                     router={router}
-                     item={item}
-                     index={index}
-                     conversationId={conversation.idConversation}
-                  />
-               }
-            />
+            <View className="mx-4">
+               <FlatList
+                  data={users}
+                  keyExtractor={(item, index) => index.toString()}
+                  showsVerticalScrollIndicator={true}
+                  renderItem={({ item, index }) =>
+                     <MembersList
+                        noBorder={index + 1 === users.length}
+                        router={router}
+                        item={item}
+                        index={index}
+                        conversationId={conversation.idConversation}
+                     />
+                  }
+               />
+            </View>
          )}
 
          <AlertNotificationRoot colors={[{

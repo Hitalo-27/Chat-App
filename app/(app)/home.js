@@ -37,7 +37,7 @@ export default function Home() {
    const getConvesations = async () => {
       try {
          const responseUsers = await axios.get(
-            'http://192.168.15.11:8080/chat/conversation/by-user',
+            'https://aps-redes-service.onrender.com/chat/conversation/by-user',
             {
                headers: {
                   'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export default function Home() {
          );
 
          const responseGroups = await axios.get(
-            'http://192.168.15.11:8080/group/conversation/by-user',
+            'https://aps-redes-service.onrender.com/group/conversation/by-user',
             {
                headers: {
                   'Content-Type': 'application/json',
