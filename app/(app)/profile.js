@@ -31,6 +31,7 @@ export default function Profile() {
 
    const handleUpdateUser = async () => {
       try {
+         setLoading(true);
          const formData = new FormData();
          formData.append('name', name);
          formData.append('password', password);
@@ -88,6 +89,9 @@ export default function Profile() {
          });
 
          return;
+      }
+      finally {
+         setLoading(false);
       }
    };
 
@@ -175,7 +179,6 @@ export default function Profile() {
                      />
                   </View>
 
-                  {/* botão de login */}
                   <View>
                      {
                         loading ? (

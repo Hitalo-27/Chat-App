@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Entypo, Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,12 @@ export default function ChatRoomHeader({ router, user }) {
     setMessages([]);
     router.back();
   }
+
+  useEffect(() => {
+    if (user) {
+      setImageUri(`https://drive.google.com/uc?id=${user.imageName ? JSON.parse(user.imageName).id : ''}`);
+    }
+  }, [user]);
 
   return (
     <Stack.Screen

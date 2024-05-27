@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
 import Slider from '@react-native-community/slider';
 
-export default function MessageList({ scrollViewRef, messages, currentUser }) {
+export default function MessageList({ scrollViewRef, messages, currentUser, isGroup }) {
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [arquivoModal, setarquivoModal] = useState('');
   const [extensao, setExtensao] = useState('');
@@ -87,7 +87,7 @@ export default function MessageList({ scrollViewRef, messages, currentUser }) {
       >
         {messages ? (
           messages.map((message, index) => (
-            <MessageItem key={index} message={message} currentUser={currentUser} toggleFullScreen={toggleFullScreen} />
+            <MessageItem key={index} message={message} currentUser={currentUser} toggleFullScreen={toggleFullScreen} isGroup={isGroup} />
           ))
         ) : null}
       </ScrollView>

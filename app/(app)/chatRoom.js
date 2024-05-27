@@ -30,6 +30,7 @@ export default function ChatRoom() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setMessages([]);
     fetchMessages();
 
     const keyboardDidShowListener = Keyboard.addListener(
@@ -78,8 +79,8 @@ export default function ChatRoom() {
     }
   };
 
-  async function sendMessage(audioTeste = null) {
-    if (messageAtual || mediaCompleted || audioTeste) {
+  async function sendMessage(audioMessage = null) {
+    if (messageAtual || mediaCompleted || audioMessage) {
       try {
         setLoading(true);
         let uri = null;
@@ -110,9 +111,9 @@ export default function ChatRoom() {
             name: name,
             type: type,
           });
-        } else if (audioTeste) {
+        } else if (audioMessage) {
           formData.append('file', {
-            uri: audioTeste,
+            uri: audioMessage,
             name: 'audio.m4a',
             type: 'audio/m4a',
           });
@@ -230,7 +231,7 @@ export default function ChatRoom() {
         <View className="h-3 border-b border-neutral-800" />
         <View className="flex-1 justify-between bg-neutral-100 overflow-visible" style={{ backgroundColor: "#121212" }}>
           <View className="flex-1">
-            <MessageList scrollViewRef={scrollViewRef} messages={messages} currentUser={{ userId: user.id }} />
+            <MessageList scrollViewRef={scrollViewRef} messages={messages} currentUser={{ userId: user.id }} isGroup={params.isGroup} />
           </View>
           {media && (
             <View className="flex-row items-center justify-center p-2 mx-3" style={{ width: wp(30), height: hp(10) }}>

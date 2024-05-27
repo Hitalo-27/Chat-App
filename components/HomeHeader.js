@@ -1,5 +1,5 @@
 import { Platform, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -37,6 +37,12 @@ export default function HomeHeader({title}) {
    const handleGroupCreation = () => {
       router.push("addUsersGroup");
    }
+
+   useEffect(() => {
+      if (user) {
+         setImageUri(`https://drive.google.com/uc?id=${user.imageName ? JSON.parse(user.imageName).id : ''}`);
+      }
+   }, [user]);
 
    return (
       <View style={{ paddingTop: ios ? top : top + 10 }} className="flex-row justify-between px-5 bg-purple-900 pb-6 rounded-b-3xl shadow">

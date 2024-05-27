@@ -96,6 +96,8 @@ export default function CreateGroup() {
                visualizeLastMessage: null,
                senderIdLastMessage: null,
                groupConversation: true,
+               groupDescription: description,
+               isGroup: true
             }
          });
          return;

@@ -5,7 +5,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { FontAwesome } from '@expo/vector-icons';
 import { Audio, Video } from 'expo-av';
 
-export default function MessageItem({ message, currentUser, toggleFullScreen }) {
+export default function MessageItem({ message, currentUser, toggleFullScreen, isGroup }) {
   const [imageUri, setImageUri] = useState(`https://drive.google.com/uc?id=${message.imageName ? JSON.parse(message.imageName).id : ''}`);
   const [mediaUri, setMediaUri] = useState(`https://drive.google.com/uc?export=download&id=${message.imageName ? JSON.parse(message.imageName).id : ''}`);
   const [extensao, setExtensao] = useState(message.imageName ? JSON.parse(message.imageName).extensao : '');
@@ -16,6 +16,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
   const [isLoadingMedia, setIsLoadingMedia] = useState(true);
   const soundRef = useRef(null);
   const progressBarRef = useRef(null);
+  const isGroupMessage = isGroup;
 
   const handleImageError = () => {
     setImageUri(fallbackImageUri);
@@ -228,7 +229,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
         return (
           <View style={styles.messageRowLeft}>
             <View style={styles.messageBoxLeft}>
-              {message.senderName && (
+              {message.senderName && isGroupMessage === "true" && (
                 <Text style={{ fontSize: hp(1.2) }} className="text-blue-500 pb-2"> ~{message.senderName} </Text>
               )}
               <View style={styles.audioContainer}>
@@ -260,7 +261,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           <View className="flex-row mb-3 ml-3">
             <TouchableOpacity onPress={() => toggleFullScreen(imageUri, message.message, 'jpg')} style={{ width: wp(70) }}>
               <View className="flex self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
-                {message.senderName && (
+                {message.senderName && isGroupMessage === "true" && (
                   <Text style={{ fontSize: hp(1.2) }} className="text-blue-500 pb-2"> ~{message.senderName} </Text>
                 )}
                 <Image
@@ -283,7 +284,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
           <View className="flex-row mb-3 ml-3" >
             <TouchableOpacity onPress={() => toggleFullScreen(mediaUri, message.message, 'mp4')} style={{ width: wp(70) }}>
               <View className="relative self-start p-2 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
-                {message.senderName && (
+                {message.senderName && isGroupMessage === "true" && (
                   <Text style={{ fontSize: hp(1.2) }} className="text-blue-500 pb-2"> ~{message.senderName} </Text>
                 )}
                 {isLoadingMedia && (
@@ -317,7 +318,7 @@ export default function MessageItem({ message, currentUser, toggleFullScreen }) 
       return (
         <View style={{ width: wp(70) }} className="ml-3 mb-3">
           <View className="flex self-start p-3 rounded-2xl border border-purple-900" style={{ backgroundColor: "#581c87" }}>
-            {message.senderName && (
+            {message.senderName && isGroupMessage === "true" && (
               <Text style={{ fontSize: hp(1.2) }} className="text-blue-500"> ~{message.senderName} </Text>
             )}
             <Text style={{ fontSize: hp(1.9) }} className="text-white">

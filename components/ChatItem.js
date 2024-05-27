@@ -51,6 +51,7 @@ export default function ChatItem({ item, router, noBorder, isConversation, isGro
         senderIdLastMessage: item.senderId,
         groupConversation: groupConversation,
         groupDescription: item.groupDescription,
+        isGroup: groupConversation ? true : false
       }
     });
   }
